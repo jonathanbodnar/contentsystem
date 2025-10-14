@@ -25,9 +25,9 @@ interface Suggestion {
   relevanceScore: number
 }
 
-export default async function WritePage({ params }: { params: Promise<{ id: string }> }) {
-  const resolvedParams = await params
+export default function WritePage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter()
+  const [resolvedParams, setResolvedParams] = useState<{ id: string } | null>(null)
   const [document, setDocument] = useState<Document | null>(null)
   const [content, setContent] = useState('')
   const [title, setTitle] = useState('')
@@ -35,6 +35,11 @@ export default async function WritePage({ params }: { params: Promise<{ id: stri
   const [loading, setLoading] = useState(true)
   const [lastSaved, setLastSaved] = useState<Date | null>(null)
   const [showContextManager, setShowContextManager] = useState(false)
+
+  // Resolve params
+  useEffect(() => {
+    params.then(setResolvedParams)
+  }, [params])
 
   const fetchDocument = async (id: string) => {
     try {
@@ -56,6 +61,8 @@ export default async function WritePage({ params }: { params: Promise<{ id: stri
   }
 
   useEffect(() => {
+    if (!resolvedParams) return
+    
     if (resolvedParams.id === 'new') {
       setDocument(null)
       setContent('')
@@ -64,9 +71,10 @@ export default async function WritePage({ params }: { params: Promise<{ id: stri
     } else {
       fetchDocument(resolvedParams.id)
     }
-  }, [resolvedParams.id, router, fetchDocument])
+  }, [resolvedParams, router, fetchDocument])
 
   const saveDocument = async (isDraft: boolean = true) => {
+    if (!resolvedParams) return
     setSaving(true)
     try {
       if (resolvedParams.id === 'new') {
@@ -122,6 +130,7 @@ export default async function WritePage({ params }: { params: Promise<{ id: stri
   }
 
   const handlePush = async () => {
+    if (!resolvedParams) return
     await saveDocument(false)
     router.push(`/formats/${resolvedParams.id}`)
   }
@@ -139,7 +148,7 @@ export default async function WritePage({ params }: { params: Promise<{ id: stri
     return () => clearTimeout(timer)
   }, [content, title, saveDocument])
 
-  if (loading) {
+  if (loading || !resolvedParams) {
     return (
       <div className="h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>

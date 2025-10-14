@@ -27,15 +27,21 @@ interface DocumentFormat {
   scheduledFor?: string
 }
 
-export default async function FormatsPage({ params }: { params: Promise<{ id: string }> }) {
-  const resolvedParams = await params
+export default function FormatsPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter()
+  const [resolvedParams, setResolvedParams] = useState<{ id: string } | null>(null)
   const [document, setDocument] = useState<Document | null>(null)
   const [documentFormats, setDocumentFormats] = useState<DocumentFormat[]>([])
   const [loading, setLoading] = useState(true)
   const [processing, setProcessing] = useState(false)
 
+  // Resolve params
+  useEffect(() => {
+    params.then(setResolvedParams)
+  }, [params])
+
   const fetchData = async () => {
+    if (!resolvedParams) return
     try {
       const [docResponse, docFormatsResponse] = await Promise.all([
         fetch(`/api/documents/${resolvedParams.id}`),
@@ -59,10 +65,13 @@ export default async function FormatsPage({ params }: { params: Promise<{ id: st
   }
 
   useEffect(() => {
-    fetchData()
-  }, [fetchData, resolvedParams.id])
+    if (resolvedParams) {
+      fetchData()
+    }
+  }, [resolvedParams])
 
   const generateFormats = async () => {
+    if (!resolvedParams) return
     setProcessing(true)
     try {
       const response = await fetch(`/api/documents/${resolvedParams.id}/generate-formats`, {
@@ -80,6 +89,7 @@ export default async function FormatsPage({ params }: { params: Promise<{ id: st
   }
 
   const approveFormat = async (formatId: string) => {
+    if (!resolvedParams) return
     try {
       const response = await fetch(`/api/documents/${resolvedParams.id}/formats/${formatId}`, {
         method: 'PUT',
@@ -98,6 +108,7 @@ export default async function FormatsPage({ params }: { params: Promise<{ id: st
   }
 
   const rejectFormat = async (formatId: string) => {
+    if (!resolvedParams) return
     try {
       const response = await fetch(`/api/documents/${resolvedParams.id}/formats/${formatId}`, {
         method: 'PUT',
@@ -115,7 +126,7 @@ export default async function FormatsPage({ params }: { params: Promise<{ id: st
     }
   }
 
-  if (loading) {
+  if (loading || !resolvedParams) {
     return (
       <div className="h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
