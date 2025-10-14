@@ -17,11 +17,27 @@ export default function WritingEditor({ content, onChange, placeholder = "Start 
       StarterKit.configure({
         bulletList: {
           keepMarks: true,
-          keepAttributes: false,
+          keepAttributes: true,
+          HTMLAttributes: {
+            class: 'tiptap-bullet-list',
+          },
         },
         orderedList: {
           keepMarks: true,
-          keepAttributes: false,
+          keepAttributes: true,
+          HTMLAttributes: {
+            class: 'tiptap-ordered-list',
+          },
+        },
+        listItem: {
+          HTMLAttributes: {
+            class: 'tiptap-list-item',
+          },
+        },
+        paragraph: {
+          HTMLAttributes: {
+            class: 'tiptap-paragraph',
+          },
         },
       }),
       Placeholder.configure({
@@ -34,7 +50,7 @@ export default function WritingEditor({ content, onChange, placeholder = "Start 
     },
     editorProps: {
       attributes: {
-        class: 'focus:outline-none min-h-[500px] cursor-text',
+        class: 'focus:outline-none min-h-[500px] cursor-text tiptap-editor',
         contenteditable: 'true',
         role: 'textbox',
         'aria-label': 'Writing editor',
@@ -43,6 +59,9 @@ export default function WritingEditor({ content, onChange, placeholder = "Start 
     },
     autofocus: true,
     editable: true,
+    parseOptions: {
+      preserveWhitespace: 'full',
+    },
   })
 
   // REMOVE the content sync useEffect entirely - it's causing the loop

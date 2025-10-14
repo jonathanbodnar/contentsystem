@@ -74,4 +74,34 @@ body {
 
 .ProseMirror li {
   margin: 0.5rem 0;
+  display: list-item;
+}
+
+.ProseMirror ul {
+  list-style-type: disc;
+}
+
+.ProseMirror ol {
+  list-style-type: decimal;
+}
+
+.tiptap-bullet-list {
+  list-style-type: disc !important;
+  margin: 1rem 0 !important;
+  padding-left: 1.5rem !important;
+}
+
+.tiptap-ordered-list {
+  list-style-type: decimal !important;
+  margin: 1rem 0 !important;
+  padding-left: 1.5rem !important;
+}
+
+.tiptap-list-item {
+  display: list-item !important;
+  margin: 0.5rem 0 !important;
+}
+
+.tiptap-paragraph {
+  margin: 1rem 0;
 }

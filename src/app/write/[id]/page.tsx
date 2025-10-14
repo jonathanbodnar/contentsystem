@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { Save, ArrowLeft, Send, Database } from 'lucide-react'
 import WritingEditor from '@/components/editor/WritingEditor'
@@ -35,6 +35,8 @@ export default function WritePage({ params }: { params: Promise<{ id: string }> 
   const [loading, setLoading] = useState(true)
   const [lastSaved, setLastSaved] = useState<Date | null>(null)
   const [showContextManager, setShowContextManager] = useState(false)
+  const autoSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const lastContentRef = useRef<string>('')
 
   // Resolve params
   useEffect(() => {
@@ -135,18 +137,42 @@ export default function WritePage({ params }: { params: Promise<{ id: string }> 
     router.push(`/formats/${resolvedParams.id}`)
   }
 
-  // Auto-save functionality - DISABLED for debugging
-  // useEffect(() => {
-  //   if (!content && !title) return
+  // Smart auto-save that doesn't interfere with typing
+  useEffect(() => {
+    // Only auto-save if content has actually changed
+    if (content === lastContentRef.current) return
+    if (!content && !title) return
     
-  //   const timer = setTimeout(() => {
-  //     if (content || title) {
-  //       saveDocument()
-  //     }
-  //   }, 2000)
+    // Clear any existing timeout
+    if (autoSaveTimeoutRef.current) {
+      clearTimeout(autoSaveTimeoutRef.current)
+    }
+    
+    // Set new timeout for auto-save
+    autoSaveTimeoutRef.current = setTimeout(() => {
+      if (content !== lastContentRef.current) {
+        lastContentRef.current = content
+        saveDocument()
+      }
+    }, 3000) // Increased to 3 seconds to give more typing time
 
-  //   return () => clearTimeout(timer)
-  // }, [content, title, saveDocument])
+    return () => {
+      if (autoSaveTimeoutRef.current) {
+        clearTimeout(autoSaveTimeoutRef.current)
+      }
+    }
+  }, [content, title])
+
+  // Auto-save title changes separately (less frequent)
+  useEffect(() => {
+    if (!title.trim()) return
+    
+    const titleSaveTimeout = setTimeout(() => {
+      saveDocument()
+    }, 1000) // Title saves faster since it's less frequent
+
+    return () => clearTimeout(titleSaveTimeout)
+  }, [title])
 
   if (loading || !resolvedParams) {
     return (
@@ -174,7 +200,8 @@ export default function WritePage({ params }: { params: Promise<{ id: string }> 
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Document title..."
-              className="text-xl font-semibold bg-transparent border-none outline-none text-gray-800 placeholder-gray-400"
+              className="text-xl font-semibold bg-transparent border-none outline-none text-gray-800 placeholder-gray-400 flex-1 min-w-0"
+              autoComplete="off"
             />
           </div>
 
