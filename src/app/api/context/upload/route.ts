@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { uploadFile, generateS3Key } from '@/lib/s3'
-import pdf from 'pdf-parse'
+const pdf = require('pdf-parse')
 
 export async function POST(request: NextRequest) {
   try {
