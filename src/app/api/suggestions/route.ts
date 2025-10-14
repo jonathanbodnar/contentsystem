@@ -2,10 +2,6 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import OpenAI from 'openai'
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-})
-
 export async function POST(request: NextRequest) {
   try {
     const { content } = await request.json()
@@ -13,6 +9,18 @@ export async function POST(request: NextRequest) {
     if (!content || content.length < 50) {
       return NextResponse.json({ suggestions: [] })
     }
+
+    // Initialize OpenAI client at runtime
+    if (!process.env.OPENAI_API_KEY) {
+      return NextResponse.json({ 
+        suggestions: [],
+        error: 'OpenAI API key not configured' 
+      })
+    }
+
+    const openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+    })
 
     // Get context documents for reference
     const contextDocs = await prisma.contextDocument.findMany({
