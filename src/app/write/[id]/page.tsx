@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Save, ArrowLeft, Send, Database } from 'lucide-react'
-import WritingEditor from '@/components/editor/WritingEditor'
+import WritingEditor from '@/components/editor/SimpleEditor'
 import AISuggestions from '@/components/suggestions/AISuggestions'
 import ContextManager from '@/components/context/ContextManager'
 
@@ -214,7 +214,7 @@ export default function WritePage({ params }: { params: Promise<{ id: string }> 
         </div>
 
         {/* Editor */}
-        <div className="flex-1 overflow-hidden">
+        <div className="flex-1 overflow-y-auto">
           <WritingEditor
             content={content}
             onChange={setContent}

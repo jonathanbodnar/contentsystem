@@ -28,9 +28,16 @@ export default function WritingEditor({ content, onChange, placeholder = "Start 
         placeholder,
       }),
     ],
-    content,
+    content: content || '',
     onUpdate: ({ editor }) => {
-      onChange(editor.getHTML())
+      const html = editor.getHTML()
+      onChange(html)
+    },
+    onCreate: ({ editor }) => {
+      // Set initial content if provided
+      if (content && content !== editor.getHTML()) {
+        editor.commands.setContent(content, false)
+      }
     },
     editorProps: {
       attributes: {
@@ -45,9 +52,17 @@ export default function WritingEditor({ content, onChange, placeholder = "Start 
     editable: true,
   })
 
+  // Only update content if it's significantly different to avoid sync issues
   useEffect(() => {
     if (editor && content !== editor.getHTML()) {
-      editor.commands.setContent(content, { emitUpdate: false })
+      const currentContent = editor.getHTML()
+      // Only update if the content is actually different (not just whitespace/formatting)
+      const isSignificantlyDifferent = content.replace(/<[^>]*>/g, '').trim() !== 
+        currentContent.replace(/<[^>]*>/g, '').trim()
+      
+      if (isSignificantlyDifferent) {
+        editor.commands.setContent(content || '', false)
+      }
     }
   }, [editor, content])
 
@@ -77,13 +92,12 @@ export default function WritingEditor({ content, onChange, placeholder = "Start 
 
   return (
     <div 
-      className="w-full h-full bg-white cursor-text"
+      className="w-full h-full bg-white cursor-text p-4"
       onClick={handleClick}
     >
       <EditorContent 
         editor={editor} 
-        className="w-full h-full focus-within:outline-none"
-        style={{ minHeight: '500px' }}
+        className="w-full h-full focus-within:outline-none prose prose-lg max-w-none"
       />
     </div>
   )
