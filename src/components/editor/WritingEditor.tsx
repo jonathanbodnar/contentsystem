@@ -36,7 +36,7 @@ export default function WritingEditor({ content, onChange, placeholder = "Start 
     onCreate: ({ editor }) => {
       // Set initial content if provided
       if (content && content !== editor.getHTML()) {
-        editor.commands.setContent(content, false)
+        editor.commands.setContent(content, { emitUpdate: false })
       }
     },
     editorProps: {
@@ -61,7 +61,7 @@ export default function WritingEditor({ content, onChange, placeholder = "Start 
         currentContent.replace(/<[^>]*>/g, '').trim()
       
       if (isSignificantlyDifferent) {
-        editor.commands.setContent(content || '', false)
+        editor.commands.setContent(content || '', { emitUpdate: false })
       }
     }
   }, [editor, content])

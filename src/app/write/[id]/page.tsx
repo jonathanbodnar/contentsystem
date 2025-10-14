@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Save, ArrowLeft, Send, Database } from 'lucide-react'
-import WritingEditor from '@/components/editor/SimpleEditor'
+import WritingEditor from '@/components/editor/WritingEditor'
 import AISuggestions from '@/components/suggestions/AISuggestions'
 import ContextManager from '@/components/context/ContextManager'
 
