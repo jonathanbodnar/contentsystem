@@ -1,36 +1,162 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Writing Assistant
 
-## Getting Started
+A minimal, AI-powered writing interface that helps you create content and automatically formats it for different platforms (LinkedIn, X, Newsletter, YouTube).
 
-First, run the development server:
+## Features
+
+### ✍️ Minimal Writing Interface
+- Clean, distraction-free WYSIWYG editor powered by TipTap
+- White background, no borders, minimal toolbar
+- Auto-save functionality with draft management
+- Document organization with folder system
+
+### 🤖 AI-Powered Suggestions
+- Real-time contextual suggestions as you write
+- Pulls from your personal context database
+- References previous writings and uploaded documents
+- Helps remember facts, stories, and ideas
+
+### 📄 Context Database
+- Upload PDF documents to build your knowledge base
+- AI analyzes and references your personal content
+- Secure storage using Wasabi S3
+- Easy document management interface
+
+### 🎯 Multi-Format Publishing
+- Automatically transforms content for different platforms:
+  - **LinkedIn**: Professional posts with hashtags and CTAs
+  - **X (Twitter)**: Threaded tweets with optimal character counts
+  - **Newsletter**: Email-friendly format with sections
+  - **YouTube**: Video scripts with engagement prompts
+- Custom prompts and context files for each format
+- Review and approve generated content before publishing
+
+### 📅 Content Calendar
+- Automated scheduling based on posting rules
+- Visual calendar view of all scheduled content
+- Copy-to-clipboard functionality for each platform
+- Track published vs. scheduled content
+
+## Setup Instructions
+
+### 1. Environment Configuration
+
+Copy the example environment file and configure your settings:
+
+```bash
+cp .env.example .env.local
+```
+
+Update `.env.local` with your configuration:
+
+```env
+# Database
+DATABASE_URL="file:./dev.db"
+
+# OpenAI API Key (required for AI suggestions and format generation)
+OPENAI_API_KEY=your_openai_api_key_here
+
+# Wasabi S3 Configuration (for PDF storage)
+WASABI_ACCESS_KEY_ID=your_wasabi_access_key
+WASABI_SECRET_ACCESS_KEY=your_wasabi_secret_key
+WASABI_BUCKET_NAME=your_bucket_name
+WASABI_REGION=us-east-1
+WASABI_ENDPOINT=https://s3.us-east-1.wasabisys.com
+```
+
+### 2. Database Setup
+
+Initialize the database:
+
+```bash
+npx prisma db push
+```
+
+### 3. Install Dependencies
+
+```bash
+npm install
+```
+
+### 4. Run the Application
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Visit `http://localhost:3000` to start using the writing assistant.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## How to Use
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 1. Start Writing
+- Click "New Document" or "Start Writing" to open the minimal editor
+- Begin typing your thoughts - the interface is completely clean and distraction-free
+- AI suggestions will appear on the right as you write more content
 
-## Learn More
+### 2. Build Your Context Database
+- Click the "Context" button in the editor header
+- Upload PDF documents containing your personal writing, stories, and context
+- The AI will reference this content to provide better suggestions
 
-To learn more about Next.js, take a look at the following resources:
+### 3. Save and Organize
+- Documents auto-save as drafts while you write
+- Use the sidebar to organize documents in folders
+- Edit saved documents by selecting them from the sidebar
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 4. Generate Formats
+- When ready to publish, click "Push to Formats"
+- The AI will automatically generate platform-specific versions
+- Review each format and approve the ones you like
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### 5. Schedule and Publish
+- Approved formats are automatically added to your content calendar
+- View the calendar to see all scheduled posts
+- Copy content directly to paste into each platform
 
-## Deploy on Vercel
+## Technical Architecture
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- **Frontend**: Next.js 14 with TypeScript and Tailwind CSS
+- **Editor**: TipTap for minimal WYSIWYG experience
+- **Database**: SQLite with Prisma ORM
+- **AI**: OpenAI GPT-4 for suggestions and format generation
+- **Storage**: Wasabi S3 for PDF document storage
+- **UI Components**: Radix UI and Lucide icons
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Platform-Specific Formatting
+
+### LinkedIn Posts
+- Professional tone with clear hooks
+- Optimal hashtag usage (3-5 tags)
+- Call-to-action for engagement
+- Under 1300 characters for best reach
+
+### X (Twitter) Threads
+- Broken into digestible tweets (<280 chars)
+- Numbered thread format (1/n, 2/n, etc.)
+- Strategic hashtag placement
+- Engaging hook and summary
+
+### Newsletter Format
+- Compelling subject lines
+- Scannable sections with headers
+- Conversational, friendly tone
+- Clear call-to-action
+
+### YouTube Scripts
+- Strong 15-second hook
+- Natural, spoken language
+- Engagement prompts throughout
+- Suggested timestamps and title
+
+## Customization
+
+You can customize the format prompts and posting rules by:
+
+1. Accessing the format management interface
+2. Editing the default prompts for each platform
+3. Uploading additional context files for specific formats
+4. Adjusting posting frequency and timing rules
+
+## Support
+
+For issues or questions, please check the application logs or create an issue in the project repository.

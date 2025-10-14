@@ -1,0 +1,125 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Document {
+  id          String   @id @default(cuid())
+  title       String
+  content     String
+  isDraft     Boolean  @default(true)
+  folderId    String?
+  folder      Folder?  @relation(fields: [folderId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  versions    DocumentVersion[]
+  formats     DocumentFormat[]
+  
+  @@map("documents")
+}
+
+model DocumentVersion {
+  id         String   @id @default(cuid())
+  documentId String
+  document   Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  content    String
+  version    Int
+  createdAt  DateTime @default(now())
+  
+  @@map("document_versions")
+}
+
+model Folder {
+  id        String     @id @default(cuid())
+  name      String
+  parentId  String?
+  parent    Folder?    @relation("FolderHierarchy", fields: [parentId], references: [id])
+  children  Folder[]   @relation("FolderHierarchy")
+  documents Document[]
+  createdAt DateTime   @default(now())
+  
+  @@map("folders")
+}
+
+model ContextDocument {
+  id        String   @id @default(cuid())
+  filename  String
+  content   String
+  s3Key     String   @unique
+  createdAt DateTime @default(now())
+  
+  @@map("context_documents")
+}
+
+model Format {
+  id              String           @id @default(cuid())
+  name            String           @unique
+  platform        String
+  prompt          String
+  contextFiles    String?          // JSON array of S3 keys
+  postingRules    PostingRule[]
+  documentFormats DocumentFormat[]
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  
+  @@map("formats")
+}
+
+model PostingRule {
+  id            String @id @default(cuid())
+  formatId      String
+  format        Format @relation(fields: [formatId], references: [id], onDelete: Cascade)
+  frequency     Int    // posts per week
+  dayOfWeek     Int?   // 0-6, null for any day
+  timeOfDay     String? // HH:MM format
+  
+  @@map("posting_rules")
+}
+
+model DocumentFormat {
+  id           String            @id @default(cuid())
+  documentId   String
+  document     Document          @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  formatId     String
+  format       Format            @relation(fields: [formatId], references: [id])
+  content      String
+  status       DocumentFormatStatus @default(PENDING)
+  scheduledFor DateTime?
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+  
+  @@unique([documentId, formatId])
+  @@map("document_formats")
+}
+
+model CalendarPost {
+  id               String   @id @default(cuid())
+  documentFormatId String   @unique
+  title            String
+  content          String
+  platform         String
+  scheduledDate    DateTime
+  status           CalendarPostStatus @default(SCHEDULED)
+  createdAt        DateTime @default(now())
+  
+  @@map("calendar_posts")
+}
+
+enum DocumentFormatStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum CalendarPostStatus {
+  SCHEDULED
+  PUBLISHED
+  CANCELLED
+}
