@@ -233,7 +233,7 @@ function FormatEditor({ format, onSave, onClose }: {
   const [platform, setPlatform] = useState(format?.platform || '')
   const [prompt, setPrompt] = useState(format?.prompt || '')
   const [frequency, setFrequency] = useState(format?.postingRules[0]?.frequency || 1)
-  const [dayOfWeek, setDayOfWeek] = useState(format?.postingRules[0]?.dayOfWeek || '')
+  const [dayOfWeek, setDayOfWeek] = useState(format?.postingRules[0]?.dayOfWeek?.toString() || '')
   const [timeOfDay, setTimeOfDay] = useState(format?.postingRules[0]?.timeOfDay || '')
   const [contextFiles, setContextFiles] = useState<string[]>(format?.contextFiles || [])
   const [showContextUpload, setShowContextUpload] = useState(false)
