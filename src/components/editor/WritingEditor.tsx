@@ -30,14 +30,7 @@ export default function WritingEditor({ content, onChange, placeholder = "Start 
     ],
     content: content || '',
     onUpdate: ({ editor }) => {
-      const html = editor.getHTML()
-      onChange(html)
-    },
-    onCreate: ({ editor }) => {
-      // Set initial content if provided
-      if (content && content !== editor.getHTML()) {
-        editor.commands.setContent(content, { emitUpdate: false })
-      }
+      onChange(editor.getHTML())
     },
     editorProps: {
       attributes: {
@@ -52,19 +45,7 @@ export default function WritingEditor({ content, onChange, placeholder = "Start 
     editable: true,
   })
 
-  // Only update content if it's significantly different to avoid sync issues
-  useEffect(() => {
-    if (editor && content !== editor.getHTML()) {
-      const currentContent = editor.getHTML()
-      // Only update if the content is actually different (not just whitespace/formatting)
-      const isSignificantlyDifferent = content.replace(/<[^>]*>/g, '').trim() !== 
-        currentContent.replace(/<[^>]*>/g, '').trim()
-      
-      if (isSignificantlyDifferent) {
-        editor.commands.setContent(content || '', { emitUpdate: false })
-      }
-    }
-  }, [editor, content])
+  // REMOVE the content sync useEffect entirely - it's causing the loop
 
   // Auto-focus the editor when it's ready
   useEffect(() => {

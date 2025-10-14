@@ -135,18 +135,18 @@ export default function WritePage({ params }: { params: Promise<{ id: string }> 
     router.push(`/formats/${resolvedParams.id}`)
   }
 
-  // Auto-save functionality
-  useEffect(() => {
-    if (!content && !title) return
+  // Auto-save functionality - DISABLED for debugging
+  // useEffect(() => {
+  //   if (!content && !title) return
     
-    const timer = setTimeout(() => {
-      if (content || title) {
-        saveDocument()
-      }
-    }, 2000)
+  //   const timer = setTimeout(() => {
+  //     if (content || title) {
+  //       saveDocument()
+  //     }
+  //   }, 2000)
 
-    return () => clearTimeout(timer)
-  }, [content, title, saveDocument])
+  //   return () => clearTimeout(timer)
+  // }, [content, title, saveDocument])
 
   if (loading || !resolvedParams) {
     return (
