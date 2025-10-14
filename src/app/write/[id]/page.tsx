@@ -39,6 +39,7 @@ export default function WritePage({ params }: { params: Promise<{ id: string }> 
   const [showIkigaiEditor, setShowIkigaiEditor] = useState(false)
   const autoSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const lastContentRef = useRef<string>('')
+  const documentLoadedRef = useRef<boolean>(false)
 
   // Resolve params
   useEffect(() => {
@@ -51,8 +52,14 @@ export default function WritePage({ params }: { params: Promise<{ id: string }> 
       if (response.ok) {
         const data = await response.json()
         setDocument(data.document)
-        setContent(data.document.content)
-        setTitle(data.document.title)
+        setContent(data.document.content || '')
+        
+        // Only set title on initial load, not on subsequent fetches
+        if (!documentLoadedRef.current) {
+          setTitle(data.document.title || '')
+          documentLoadedRef.current = true
+        }
+        console.log('Document loaded:', { title: data.document.title, content: data.document.content?.length })
       } else {
         router.push('/')
       }
@@ -66,6 +73,9 @@ export default function WritePage({ params }: { params: Promise<{ id: string }> 
 
   useEffect(() => {
     if (!resolvedParams) return
+    
+    // Reset the document loaded flag when switching documents
+    documentLoadedRef.current = false
     
     if (resolvedParams.id === 'new') {
       setDocument(null)
@@ -139,31 +149,31 @@ export default function WritePage({ params }: { params: Promise<{ id: string }> 
     router.push(`/formats/${resolvedParams.id}`)
   }
 
-  // Smart auto-save that doesn't interfere with typing
-  useEffect(() => {
-    // Only auto-save if content has actually changed
-    if (content === lastContentRef.current) return
-    if (!content && !title) return
+  // DISABLE ALL AUTO-SAVE for debugging title issue
+  // useEffect(() => {
+  //   // Only auto-save if content has actually changed
+  //   if (content === lastContentRef.current) return
+  //   if (!content && !title) return
     
-    // Clear any existing timeout
-    if (autoSaveTimeoutRef.current) {
-      clearTimeout(autoSaveTimeoutRef.current)
-    }
+  //   // Clear any existing timeout
+  //   if (autoSaveTimeoutRef.current) {
+  //     clearTimeout(autoSaveTimeoutRef.current)
+  //   }
     
-    // Set new timeout for auto-save
-    autoSaveTimeoutRef.current = setTimeout(() => {
-      if (content !== lastContentRef.current) {
-        lastContentRef.current = content
-        saveDocument()
-      }
-    }, 3000) // Increased to 3 seconds to give more typing time
+  //   // Set new timeout for auto-save
+  //   autoSaveTimeoutRef.current = setTimeout(() => {
+  //     if (content !== lastContentRef.current) {
+  //       lastContentRef.current = content
+  //       saveDocument()
+  //     }
+  //   }, 3000) // Increased to 3 seconds to give more typing time
 
-    return () => {
-      if (autoSaveTimeoutRef.current) {
-        clearTimeout(autoSaveTimeoutRef.current)
-      }
-    }
-  }, [content, title])
+  //   return () => {
+  //     if (autoSaveTimeoutRef.current) {
+  //       clearTimeout(autoSaveTimeoutRef.current)
+  //     }
+  //   }
+  // }, [content, title])
 
   // Disable title auto-save for now to prevent jumping
   // useEffect(() => {
@@ -200,10 +210,18 @@ export default function WritePage({ params }: { params: Promise<{ id: string }> 
             <input
               type="text"
               value={title}
-              onChange={(e) => setTitle(e.target.value)}
+              onChange={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                console.log('Title changing to:', e.target.value)
+                setTitle(e.target.value)
+              }}
+              onKeyDown={(e) => e.stopPropagation()}
+              onKeyUp={(e) => e.stopPropagation()}
               placeholder="Document title..."
               className="text-xl font-semibold bg-transparent border-none outline-none text-gray-800 placeholder-gray-400 flex-1 min-w-0"
               autoComplete="off"
+              spellCheck="false"
             />
           </div>
 
