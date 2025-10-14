@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { Save, ArrowLeft, Send, Database, Target } from 'lucide-react'
 import WritingEditor from '@/components/editor/WritingEditor'
@@ -38,9 +38,12 @@ export default function WritePage({ params }: { params: Promise<{ id: string }> 
   const [lastSaved, setLastSaved] = useState<Date | null>(null)
   const [showContextManager, setShowContextManager] = useState(false)
   const [showIkigaiEditor, setShowIkigaiEditor] = useState(false)
+  const [autoSaving, setAutoSaving] = useState(false)
   const autoSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null)
-  const lastContentRef = useRef<string>('')
+  const lastSavedContentRef = useRef<string>('')
+  const lastSavedTitleRef = useRef<string>('')
   const documentLoadedRef = useRef<boolean>(false)
+  const isTypingRef = useRef<boolean>(false)
 
   // Resolve params
   useEffect(() => {
@@ -88,7 +91,7 @@ export default function WritePage({ params }: { params: Promise<{ id: string }> 
     }
   }, [resolvedParams, router, fetchDocument])
 
-  const saveDocument = async (isDraft: boolean = true) => {
+  const saveDocument = useCallback(async (isDraft: boolean = true) => {
     if (!resolvedParams) return
     setSaving(true)
     try {
@@ -131,12 +134,16 @@ export default function WritePage({ params }: { params: Promise<{ id: string }> 
         }
       }
       setLastSaved(new Date())
+      
+      // Update our saved content refs
+      lastSavedContentRef.current = content
+      lastSavedTitleRef.current = title
     } catch (error) {
       console.error('Failed to save document:', error)
     } finally {
       setSaving(false)
     }
-  }
+  }, [resolvedParams, content, title, router])
 
   const handleSuggestionClick = (suggestion: Suggestion) => {
     // Insert suggestion at the end of the current content
@@ -150,42 +157,92 @@ export default function WritePage({ params }: { params: Promise<{ id: string }> 
     router.push(`/formats/${resolvedParams.id}`)
   }
 
-  // DISABLE ALL AUTO-SAVE for debugging title issue
-  // useEffect(() => {
-  //   // Only auto-save if content has actually changed
-  //   if (content === lastContentRef.current) return
-  //   if (!content && !title) return
+  // Smart auto-save system that doesn't interfere with typing
+  useEffect(() => {
+    // Don't auto-save if we're currently saving or loading
+    if (saving || loading || !documentLoadedRef.current) return
     
-  //   // Clear any existing timeout
-  //   if (autoSaveTimeoutRef.current) {
-  //     clearTimeout(autoSaveTimeoutRef.current)
-  //   }
+    // Only save if content or title has actually changed since last save
+    const contentChanged = content !== lastSavedContentRef.current
+    const titleChanged = title !== lastSavedTitleRef.current
     
-  //   // Set new timeout for auto-save
-  //   autoSaveTimeoutRef.current = setTimeout(() => {
-  //     if (content !== lastContentRef.current) {
-  //       lastContentRef.current = content
-  //       saveDocument()
-  //     }
-  //   }, 3000) // Increased to 3 seconds to give more typing time
-
-  //   return () => {
-  //     if (autoSaveTimeoutRef.current) {
-  //       clearTimeout(autoSaveTimeoutRef.current)
-  //     }
-  //   }
-  // }, [content, title])
-
-  // Disable title auto-save for now to prevent jumping
-  // useEffect(() => {
-  //   if (!title.trim()) return
+    if (!contentChanged && !titleChanged) return
+    if (!content.trim() && !title.trim()) return
     
-  //   const titleSaveTimeout = setTimeout(() => {
-  //     saveDocument()
-  //   }, 1000)
+    // Clear any existing timeout
+    if (autoSaveTimeoutRef.current) {
+      clearTimeout(autoSaveTimeoutRef.current)
+    }
+    
+    // Set typing flag to prevent saves during active typing
+    isTypingRef.current = true
+    
+    // Auto-save after user stops typing for 5 seconds
+    autoSaveTimeoutRef.current = setTimeout(async () => {
+      // Double-check that content has actually changed
+      if (content !== lastSavedContentRef.current || title !== lastSavedTitleRef.current) {
+        console.log('Auto-saving...', { 
+          contentChanged: content !== lastSavedContentRef.current,
+          titleChanged: title !== lastSavedTitleRef.current 
+        })
+        setAutoSaving(true)
+        await saveDocument()
+        setAutoSaving(false)
+      }
+      isTypingRef.current = false
+    }, 5000) // 5 seconds after stopping typing
 
-  //   return () => clearTimeout(titleSaveTimeout)
-  // }, [title])
+    return () => {
+      if (autoSaveTimeoutRef.current) {
+        clearTimeout(autoSaveTimeoutRef.current)
+      }
+    }
+  }, [content, title, saving, loading, saveDocument])
+
+  // Update saved refs when document is initially loaded
+  useEffect(() => {
+    if (documentLoadedRef.current) {
+      lastSavedContentRef.current = content
+      lastSavedTitleRef.current = title
+    }
+  }, [content, title])
+
+  // Save on page unload/visibility change
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.hidden && (content !== lastSavedContentRef.current || title !== lastSavedTitleRef.current)) {
+        saveDocument()
+      }
+    }
+
+    const handleBeforeUnload = () => {
+      if (content !== lastSavedContentRef.current || title !== lastSavedTitleRef.current) {
+        saveDocument()
+      }
+    }
+
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    window.addEventListener('beforeunload', handleBeforeUnload)
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+      window.removeEventListener('beforeunload', handleBeforeUnload)
+    }
+  }, [content, title, saveDocument])
+
+  // Keyboard shortcut for manual save (Cmd/Ctrl + S)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 's') {
+        e.preventDefault()
+        console.log('Manual save triggered via keyboard shortcut')
+        saveDocument()
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [saveDocument])
 
   if (loading || !resolvedParams) {
     return (
@@ -219,11 +276,16 @@ export default function WritePage({ params }: { params: Promise<{ id: string }> 
           </div>
 
           <div className="flex items-center gap-3">
-            {lastSaved && (
-              <span className="text-sm text-gray-500">
-                Saved {lastSaved.toLocaleTimeString()}
+            {autoSaving ? (
+              <span className="text-sm text-blue-600 flex items-center gap-1">
+                <div className="w-3 h-3 border border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                Auto-saving...
               </span>
-            )}
+            ) : lastSaved ? (
+              <span className="text-sm text-green-600">
+                ✓ Saved {lastSaved.toLocaleTimeString()}
+              </span>
+            ) : null}
             
             <button
               onClick={() => setShowIkigaiEditor(true)}
