@@ -210,7 +210,7 @@ export default function WritePage({ params }: { params: Promise<{ id: string }> 
   // Save on page unload/visibility change
   useEffect(() => {
     const handleVisibilityChange = () => {
-      if (typeof document !== 'undefined' && document.hidden && (content !== lastSavedContentRef.current || title !== lastSavedTitleRef.current)) {
+      if (typeof document !== 'undefined' && document && document.hidden && (content !== lastSavedContentRef.current || title !== lastSavedTitleRef.current)) {
         saveDocument()
       }
     }
