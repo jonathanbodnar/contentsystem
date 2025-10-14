@@ -15,10 +15,16 @@ interface Format {
 }
 
 interface PostingRule {
-  id: string
+  id?: string
   frequency: number
-  dayOfWeek?: number
-  timeOfDay?: string
+  dayOfWeek?: number | null
+  timeOfDay?: string | null
+}
+
+interface PostingRuleInput {
+  frequency: number
+  dayOfWeek?: number | null
+  timeOfDay?: string | null
 }
 
 export default function FormatManagePage() {
@@ -47,7 +53,7 @@ export default function FormatManagePage() {
     }
   }
 
-  const handleSaveFormat = async (formatData: Partial<Format>) => {
+  const handleSaveFormat = async (formatData: Partial<Format> & { postingRules: PostingRuleInput[] }) => {
     try {
       const url = editingFormat ? `/api/formats/${editingFormat.id}` : '/api/formats'
       const method = editingFormat ? 'PUT' : 'POST'
@@ -226,7 +232,7 @@ function FormatCard({ format, onEdit, onDelete }: {
 
 function FormatEditor({ format, onSave, onClose }: {
   format: Format | null
-  onSave: (data: Partial<Format>) => void
+  onSave: (data: Partial<Format> & { postingRules: PostingRuleInput[] }) => void
   onClose: () => void
 }) {
   const [name, setName] = useState(format?.name || '')
