@@ -210,7 +210,7 @@ export default function WritePage({ params }: { params: Promise<{ id: string }> 
   // Save on page unload/visibility change
   useEffect(() => {
     const handleVisibilityChange = () => {
-      if (document.hidden && (content !== lastSavedContentRef.current || title !== lastSavedTitleRef.current)) {
+      if (typeof document !== 'undefined' && document.hidden && (content !== lastSavedContentRef.current || title !== lastSavedTitleRef.current)) {
         saveDocument()
       }
     }
@@ -221,12 +221,20 @@ export default function WritePage({ params }: { params: Promise<{ id: string }> 
       }
     }
 
-    document.addEventListener('visibilitychange', handleVisibilityChange)
-    window.addEventListener('beforeunload', handleBeforeUnload)
+    if (typeof document !== 'undefined') {
+      document.addEventListener('visibilitychange', handleVisibilityChange)
+    }
+    if (typeof window !== 'undefined') {
+      window.addEventListener('beforeunload', handleBeforeUnload)
+    }
 
     return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange)
-      window.removeEventListener('beforeunload', handleBeforeUnload)
+      if (typeof document !== 'undefined') {
+        document.removeEventListener('visibilitychange', handleVisibilityChange)
+      }
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('beforeunload', handleBeforeUnload)
+      }
     }
   }, [content, title, saveDocument])
 
@@ -240,8 +248,14 @@ export default function WritePage({ params }: { params: Promise<{ id: string }> 
       }
     }
 
-    document.addEventListener('keydown', handleKeyDown)
-    return () => document.removeEventListener('keydown', handleKeyDown)
+    if (typeof document !== 'undefined') {
+      document.addEventListener('keydown', handleKeyDown)
+    }
+    return () => {
+      if (typeof document !== 'undefined') {
+        document.removeEventListener('keydown', handleKeyDown)
+      }
+    }
   }, [saveDocument])
 
   if (loading || !resolvedParams) {
