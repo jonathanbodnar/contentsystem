@@ -35,17 +35,6 @@ export default function WritePage({ params }: { params: { id: string } }) {
   const [lastSaved, setLastSaved] = useState<Date | null>(null)
   const [showContextManager, setShowContextManager] = useState(false)
 
-  useEffect(() => {
-    if (params.id === 'new') {
-      setDocument(null)
-      setContent('')
-      setTitle('')
-      setLoading(false)
-    } else {
-      fetchDocument(params.id)
-    }
-  }, [params.id])
-
   const fetchDocument = async (id: string) => {
     try {
       const response = await fetch(`/api/documents/${id}`)
@@ -64,6 +53,17 @@ export default function WritePage({ params }: { params: { id: string } }) {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    if (params.id === 'new') {
+      setDocument(null)
+      setContent('')
+      setTitle('')
+      setLoading(false)
+    } else {
+      fetchDocument(params.id)
+    }
+  }, [params.id, router])
 
   const saveDocument = async (isDraft: boolean = true) => {
     setSaving(true)
@@ -136,7 +136,7 @@ export default function WritePage({ params }: { params: { id: string } }) {
     }, 2000)
 
     return () => clearTimeout(timer)
-  }, [content, title])
+  }, [content, title, saveDocument])
 
   if (loading) {
     return (

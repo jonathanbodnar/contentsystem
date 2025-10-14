@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { Calendar as CalendarIcon, Copy, ArrowLeft, Eye, X } from 'lucide-react'
 import { DayPicker } from 'react-day-picker'
 import 'react-day-picker/dist/style.css'
@@ -17,7 +17,7 @@ interface CalendarPost {
 
 export default function CalendarPage() {
   const router = useRouter()
-  const searchParams = useSearchParams()
+  // const searchParams = useSearchParams()
   const [posts, setPosts] = useState<CalendarPost[]>([])
   const [selectedDate, setSelectedDate] = useState<Date>(new Date())
   const [selectedPost, setSelectedPost] = useState<CalendarPost | null>(null)

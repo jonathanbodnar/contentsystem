@@ -30,31 +30,20 @@ interface DocumentFormat {
 export default function FormatsPage({ params }: { params: { id: string } }) {
   const router = useRouter()
   const [document, setDocument] = useState<Document | null>(null)
-  const [formats, setFormats] = useState<Format[]>([])
   const [documentFormats, setDocumentFormats] = useState<DocumentFormat[]>([])
   const [loading, setLoading] = useState(true)
   const [processing, setProcessing] = useState(false)
 
-  useEffect(() => {
-    fetchData()
-  }, [params.id])
-
   const fetchData = async () => {
     try {
-      const [docResponse, formatsResponse, docFormatsResponse] = await Promise.all([
+      const [docResponse, docFormatsResponse] = await Promise.all([
         fetch(`/api/documents/${params.id}`),
-        fetch('/api/formats'),
         fetch(`/api/documents/${params.id}/formats`)
       ])
 
       if (docResponse.ok) {
         const docData = await docResponse.json()
         setDocument(docData.document)
-      }
-
-      if (formatsResponse.ok) {
-        const formatsData = await formatsResponse.json()
-        setFormats(formatsData.formats)
       }
 
       if (docFormatsResponse.ok) {
@@ -67,6 +56,10 @@ export default function FormatsPage({ params }: { params: { id: string } }) {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    fetchData()
+  }, [fetchData, params.id])
 
   const generateFormats = async () => {
     setProcessing(true)

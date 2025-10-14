@@ -41,14 +41,26 @@ export async function PUT(
   }
 }
 
-async function createCalendarEntry(documentFormat: any) {
+async function createCalendarEntry(documentFormat: {
+  id: string
+  documentId: string
+  format: {
+    name: string
+    platform: string
+    postingRules: Array<{
+      dayOfWeek: number | null
+      timeOfDay: string | null
+    }>
+  }
+  content: string
+}) {
   try {
     // Calculate next scheduled date based on posting rules
     const postingRule = documentFormat.format.postingRules[0]
     if (!postingRule) return
 
     const now = new Date()
-    let scheduledDate = new Date(now)
+    const scheduledDate = new Date(now)
 
     // Simple scheduling logic - can be enhanced
     if (postingRule.dayOfWeek !== null) {
