@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Database, Target } from 'lucide-react'
+import { Database, Target, BookOpen } from 'lucide-react'
 import DocumentList from '@/components/sidebar/DocumentList'
 import ContextManager from '@/components/context/ContextManager'
 import IkigaiEditor from '@/components/ikigai/IkigaiEditor'
@@ -49,6 +49,14 @@ export default function Home() {
             <Target className="w-4 h-4" />
             Ikigai
           </button>
+
+          <button
+            onClick={() => router.push('/playbooks')}
+            className="flex items-center gap-2 px-4 py-2 text-green-600 hover:text-green-800 hover:bg-green-50 rounded-lg transition-colors"
+          >
+            <BookOpen className="w-4 h-4" />
+            Playbooks
+          </button>
           
           <button
             onClick={() => setShowContextManager(true)}
@@ -68,12 +76,18 @@ export default function Home() {
             <p className="text-gray-600 mb-8 max-w-md">
               Select a document from the sidebar to start editing, or create a new document to begin writing.
             </p>
-            <div className="flex gap-4 justify-center">
+            <div className="grid grid-cols-2 gap-4 max-w-lg mx-auto">
               <button
                 onClick={handleNewDocument}
                 className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
               >
                 Start Writing
+              </button>
+              <button
+                onClick={() => router.push('/playbooks')}
+                className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+              >
+                Create Playbook
               </button>
               <button
                 onClick={() => setShowIkigaiEditor(true)}

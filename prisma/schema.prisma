@@ -21,6 +21,7 @@ model Document {
   updatedAt   DateTime @updatedAt
   versions    DocumentVersion[]
   formats     DocumentFormat[]
+  playbooks   Playbook[]
   
   @@map("documents")
 }
@@ -130,6 +131,49 @@ model Ikigai {
   createdAt DateTime @default(now())
   
   @@map("ikigai")
+}
+
+model Playbook {
+  id              String         @id @default(cuid())
+  title           String
+  description     String?
+  sourceDocumentId String?
+  sourceDocument  Document?      @relation(fields: [sourceDocumentId], references: [id])
+  content         String         // JSON structure for steps/activities
+  prompt          String         // AI prompt for generating playbook
+  slides          PlaybookSlide[]
+  isDraft         Boolean        @default(true)
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  
+  @@map("playbooks")
+}
+
+model PlaybookSlide {
+  id          String   @id @default(cuid())
+  playbookId  String
+  playbook    Playbook @relation(fields: [playbookId], references: [id], onDelete: Cascade)
+  order       Int
+  title       String
+  content     String   // Rich text content
+  layout      String   @default("text") // text, image-text, image-grid, etc.
+  images      String?  // JSON array of image URLs/S3 keys
+  position    String?  // JSON for drag-drop positioning
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@map("playbook_slides")
+}
+
+model PlaybookTemplate {
+  id          String   @id @default(cuid())
+  name        String
+  description String
+  prompt      String   // Default prompt for this template type
+  structure   String   // JSON template structure
+  createdAt   DateTime @default(now())
+  
+  @@map("playbook_templates")
 }
 
 enum CalendarPostStatus {
