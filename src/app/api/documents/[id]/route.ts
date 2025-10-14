@@ -3,11 +3,12 @@ import { prisma } from '@/lib/db'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const resolvedParams = await params
     const document = await prisma.document.findUnique({
-      where: { id: params.id },
+      where: { id: resolvedParams.id },
       include: {
         versions: {
           orderBy: { version: 'desc' },
@@ -34,15 +35,16 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const resolvedParams = await params
     const body = await request.json()
     const { title, content, isDraft } = body
 
     // Get current document to create version
     const currentDocument = await prisma.document.findUnique({
-      where: { id: params.id },
+      where: { id: resolvedParams.id },
       include: {
         versions: {
           orderBy: { version: 'desc' },
@@ -69,12 +71,12 @@ export async function PUT(
 
     const [document] = await Promise.all([
       prisma.document.update({
-        where: { id: params.id },
+        where: { id: resolvedParams.id },
         data: updateData
       }),
       shouldCreateVersion ? prisma.documentVersion.create({
         data: {
-          documentId: params.id,
+          documentId: resolvedParams.id,
           content: currentDocument.content,
           version: nextVersion
         }
@@ -90,11 +92,12 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const resolvedParams = await params
     await prisma.document.delete({
-      where: { id: params.id }
+      where: { id: resolvedParams.id }
     })
 
     return NextResponse.json({ success: true })

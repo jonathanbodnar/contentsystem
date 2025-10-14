@@ -3,17 +3,18 @@ import { prisma } from '@/lib/db'
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string; formatId: string } }
+  { params }: { params: Promise<{ id: string; formatId: string }> }
 ) {
   try {
+    const resolvedParams = await params
     const body = await request.json()
     const { status, content } = body
 
     const documentFormat = await prisma.documentFormat.update({
       where: {
         documentId_formatId: {
-          documentId: params.id,
-          formatId: params.formatId
+          documentId: resolvedParams.id,
+          formatId: resolvedParams.formatId
         }
       },
       data: {

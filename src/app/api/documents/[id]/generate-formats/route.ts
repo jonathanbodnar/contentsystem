@@ -8,12 +8,13 @@ const openai = new OpenAI({
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const resolvedParams = await params
     // Get the document
     const document = await prisma.document.findUnique({
-      where: { id: params.id }
+      where: { id: resolvedParams.id }
     })
 
     if (!document) {
@@ -97,7 +98,7 @@ Please transform the content according to the format requirements. Return only t
         prisma.documentFormat.upsert({
           where: {
             documentId_formatId: {
-              documentId: params.id,
+              documentId: resolvedParams.id,
               formatId
             }
           },
@@ -106,7 +107,7 @@ Please transform the content according to the format requirements. Return only t
             status: 'PENDING'
           },
           create: {
-            documentId: params.id,
+            documentId: resolvedParams.id,
             formatId,
             content,
             status: 'PENDING'
