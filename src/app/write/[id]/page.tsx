@@ -7,6 +7,7 @@ import WritingEditor from '@/components/editor/WritingEditor'
 import AISuggestions from '@/components/suggestions/AISuggestions'
 import ContextManager from '@/components/context/ContextManager'
 import IkigaiEditor from '@/components/ikigai/IkigaiEditor'
+import TitleInput from '@/components/TitleInput'
 
 interface Document {
   id: string
@@ -207,21 +208,13 @@ export default function WritePage({ params }: { params: Promise<{ id: string }> 
             >
               <ArrowLeft className="w-5 h-5 text-gray-600" />
             </button>
-            <input
-              type="text"
-              value={title}
-              onChange={(e) => {
-                e.preventDefault()
-                e.stopPropagation()
-                console.log('Title changing to:', e.target.value)
-                setTitle(e.target.value)
+            <TitleInput
+              initialValue={title}
+              onTitleChange={(newTitle) => {
+                console.log('Title changing to:', newTitle)
+                setTitle(newTitle)
               }}
-              onKeyDown={(e) => e.stopPropagation()}
-              onKeyUp={(e) => e.stopPropagation()}
               placeholder="Document title..."
-              className="text-xl font-semibold bg-transparent border-none outline-none text-gray-800 placeholder-gray-400 flex-1 min-w-0"
-              autoComplete="off"
-              spellCheck="false"
             />
           </div>
 
