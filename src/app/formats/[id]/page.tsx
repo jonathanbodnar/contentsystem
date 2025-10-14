@@ -27,7 +27,8 @@ interface DocumentFormat {
   scheduledFor?: string
 }
 
-export default function FormatsPage({ params }: { params: { id: string } }) {
+export default async function FormatsPage({ params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = await params
   const router = useRouter()
   const [document, setDocument] = useState<Document | null>(null)
   const [documentFormats, setDocumentFormats] = useState<DocumentFormat[]>([])
@@ -37,8 +38,8 @@ export default function FormatsPage({ params }: { params: { id: string } }) {
   const fetchData = async () => {
     try {
       const [docResponse, docFormatsResponse] = await Promise.all([
-        fetch(`/api/documents/${params.id}`),
-        fetch(`/api/documents/${params.id}/formats`)
+        fetch(`/api/documents/${resolvedParams.id}`),
+        fetch(`/api/documents/${resolvedParams.id}/formats`)
       ])
 
       if (docResponse.ok) {
@@ -59,12 +60,12 @@ export default function FormatsPage({ params }: { params: { id: string } }) {
 
   useEffect(() => {
     fetchData()
-  }, [fetchData, params.id])
+  }, [fetchData, resolvedParams.id])
 
   const generateFormats = async () => {
     setProcessing(true)
     try {
-      const response = await fetch(`/api/documents/${params.id}/generate-formats`, {
+      const response = await fetch(`/api/documents/${resolvedParams.id}/generate-formats`, {
         method: 'POST'
       })
 
@@ -80,7 +81,7 @@ export default function FormatsPage({ params }: { params: { id: string } }) {
 
   const approveFormat = async (formatId: string) => {
     try {
-      const response = await fetch(`/api/documents/${params.id}/formats/${formatId}`, {
+      const response = await fetch(`/api/documents/${resolvedParams.id}/formats/${formatId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -98,7 +99,7 @@ export default function FormatsPage({ params }: { params: { id: string } }) {
 
   const rejectFormat = async (formatId: string) => {
     try {
-      const response = await fetch(`/api/documents/${params.id}/formats/${formatId}`, {
+      const response = await fetch(`/api/documents/${resolvedParams.id}/formats/${formatId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -148,15 +149,15 @@ export default function FormatsPage({ params }: { params: { id: string } }) {
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4">
             <button
-              onClick={() => router.push(`/write/${params.id}`)}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-            >
-              <ArrowLeft className="w-5 h-5 text-gray-600" />
-            </button>
-            <div>
-              <h1 className="text-2xl font-semibold text-gray-800">
-                {document.title}
-              </h1>
+            onClick={() => router.push(`/write/${resolvedParams.id}`)}
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+          >
+            <ArrowLeft className="w-5 h-5 text-gray-600" />
+          </button>
+          <div>
+            <h1 className="text-2xl font-semibold text-gray-800">
+              {document.title}
+            </h1>
               <p className="text-gray-600">Format & Publish</p>
             </div>
           </div>
@@ -172,7 +173,7 @@ export default function FormatsPage({ params }: { params: { id: string } }) {
 
             {approvedFormats.length > 0 && (
               <button
-                onClick={() => router.push(`/calendar?document=${params.id}`)}
+                onClick={() => router.push(`/calendar?document=${resolvedParams.id}`)}
                 className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
               >
                 <Calendar className="w-4 h-4" />

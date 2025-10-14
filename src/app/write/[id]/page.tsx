@@ -25,7 +25,8 @@ interface Suggestion {
   relevanceScore: number
 }
 
-export default function WritePage({ params }: { params: { id: string } }) {
+export default async function WritePage({ params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = await params
   const router = useRouter()
   const [document, setDocument] = useState<Document | null>(null)
   const [content, setContent] = useState('')
@@ -55,20 +56,20 @@ export default function WritePage({ params }: { params: { id: string } }) {
   }
 
   useEffect(() => {
-    if (params.id === 'new') {
+    if (resolvedParams.id === 'new') {
       setDocument(null)
       setContent('')
       setTitle('')
       setLoading(false)
     } else {
-      fetchDocument(params.id)
+      fetchDocument(resolvedParams.id)
     }
-  }, [params.id, router])
+  }, [resolvedParams.id, router, fetchDocument])
 
   const saveDocument = async (isDraft: boolean = true) => {
     setSaving(true)
     try {
-      if (params.id === 'new') {
+      if (resolvedParams.id === 'new') {
         // Create new document
         const response = await fetch('/api/documents', {
           method: 'POST',
@@ -89,7 +90,7 @@ export default function WritePage({ params }: { params: { id: string } }) {
         }
       } else {
         // Update existing document
-        const response = await fetch(`/api/documents/${params.id}`, {
+        const response = await fetch(`/api/documents/${resolvedParams.id}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -122,7 +123,7 @@ export default function WritePage({ params }: { params: { id: string } }) {
 
   const handlePush = async () => {
     await saveDocument(false)
-    router.push(`/formats/${params.id}`)
+    router.push(`/formats/${resolvedParams.id}`)
   }
 
   // Auto-save functionality
