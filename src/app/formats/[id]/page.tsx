@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, Check, X, Calendar, Settings } from 'lucide-react'
+import { ArrowLeft, Check, X, Calendar, Settings, Database } from 'lucide-react'
+import ContextManager from '@/components/context/ContextManager'
 
 interface Document {
   id: string
@@ -34,6 +35,7 @@ export default function FormatsPage({ params }: { params: Promise<{ id: string }
   const [documentFormats, setDocumentFormats] = useState<DocumentFormat[]>([])
   const [loading, setLoading] = useState(true)
   const [processing, setProcessing] = useState(false)
+  const [showContextManager, setShowContextManager] = useState(false)
 
   // Resolve params
   useEffect(() => {
@@ -175,6 +177,14 @@ export default function FormatsPage({ params }: { params: Promise<{ id: string }
 
           <div className="flex items-center gap-3">
             <button
+              onClick={() => setShowContextManager(true)}
+              className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors"
+            >
+              <Database className="w-4 h-4" />
+              Context Library
+            </button>
+
+            <button
               onClick={() => router.push('/formats/manage')}
               className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors"
             >
@@ -284,6 +294,12 @@ export default function FormatsPage({ params }: { params: Promise<{ id: string }
           </div>
         )}
       </div>
+
+      {/* Global Context Manager */}
+      <ContextManager
+        isOpen={showContextManager}
+        onClose={() => setShowContextManager(false)}
+      />
     </div>
   )
 }

@@ -2,9 +2,10 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { Calendar as CalendarIcon, Copy, ArrowLeft, Eye, X } from 'lucide-react'
+import { Calendar as CalendarIcon, Copy, ArrowLeft, Eye, X, Database } from 'lucide-react'
 import { DayPicker } from 'react-day-picker'
 import 'react-day-picker/dist/style.css'
+import ContextManager from '@/components/context/ContextManager'
 
 interface CalendarPost {
   id: string
@@ -22,6 +23,7 @@ export default function CalendarPage() {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date())
   const [selectedPost, setSelectedPost] = useState<CalendarPost | null>(null)
   const [loading, setLoading] = useState(true)
+  const [showContextManager, setShowContextManager] = useState(false)
 
   useEffect(() => {
     fetchCalendarPosts()
@@ -87,6 +89,16 @@ export default function CalendarPage() {
               </h1>
               <p className="text-gray-600">Manage your scheduled posts</p>
             </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setShowContextManager(true)}
+              className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors"
+            >
+              <Database className="w-4 h-4" />
+              Context Library
+            </button>
           </div>
         </div>
       </div>
@@ -236,6 +248,12 @@ export default function CalendarPage() {
           </div>
         </div>
       )}
+
+      {/* Global Context Manager */}
+      <ContextManager
+        isOpen={showContextManager}
+        onClose={() => setShowContextManager(false)}
+      />
     </div>
   )
 }
