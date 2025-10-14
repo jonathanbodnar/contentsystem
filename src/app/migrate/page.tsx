@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { Database, CheckCircle, XCircle, Loader } from 'lucide-react'
 
 export default function MigratePage() {
@@ -94,12 +95,12 @@ export default function MigratePage() {
                   {output}
                 </pre>
               </div>
-              <a
+              <Link
                 href="/"
                 className="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
               >
                 Go to Writing Assistant
-              </a>
+              </Link>
             </div>
           )}
 
@@ -125,12 +126,12 @@ export default function MigratePage() {
                 >
                   Try Again
                 </button>
-                <a
+                <Link
                   href="/"
                   className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
                 >
                   Go Back
-                </a>
+                </Link>
               </div>
             </div>
           )}

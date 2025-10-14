@@ -1,10 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import { exec } from 'child_process'
 import { promisify } from 'util'
 
 const execAsync = promisify(exec)
 
-export async function POST(request: NextRequest) {
+export async function POST() {
   try {
     console.log('Running database migration...')
     
