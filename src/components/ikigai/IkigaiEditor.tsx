@@ -123,81 +123,81 @@ export default function IkigaiEditor({ isOpen, onClose }: IkigaiEditorProps) {
             <div className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-800 mb-2">
                     Mission Statement *
                   </label>
                   <textarea
                     value={ikigai.mission}
                     onChange={(e) => handleChange('mission', e.target.value)}
                     placeholder="What is your core mission? What are you trying to achieve?"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 h-24 resize-none"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 h-24 resize-none text-gray-900 placeholder-gray-500"
                   />
-                  <p className="text-xs text-gray-500 mt-1">Your fundamental purpose and what drives you</p>
+                  <p className="text-xs text-gray-600 mt-1">Your fundamental purpose and what drives you</p>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-800 mb-2">
                     Purpose & Why *
                   </label>
                   <textarea
                     value={ikigai.purpose}
                     onChange={(e) => handleChange('purpose', e.target.value)}
                     placeholder="Why does this matter? What impact do you want to make?"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 h-24 resize-none"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 h-24 resize-none text-gray-900 placeholder-gray-500"
                   />
-                  <p className="text-xs text-gray-500 mt-1">The deeper meaning behind your work</p>
+                  <p className="text-xs text-gray-600 mt-1">The deeper meaning behind your work</p>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-800 mb-2">
                     Core Values *
                   </label>
                   <textarea
                     value={ikigai.values}
                     onChange={(e) => handleChange('values', e.target.value)}
                     placeholder="What principles guide your decisions and content?"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 h-24 resize-none"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 h-24 resize-none text-gray-900 placeholder-gray-500"
                   />
-                  <p className="text-xs text-gray-500 mt-1">The principles that should be reflected in all content</p>
+                  <p className="text-xs text-gray-600 mt-1">The principles that should be reflected in all content</p>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-800 mb-2">
                     Goals & Outcomes *
                   </label>
                   <textarea
                     value={ikigai.goals}
                     onChange={(e) => handleChange('goals', e.target.value)}
                     placeholder="What specific outcomes are you working toward?"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 h-24 resize-none"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 h-24 resize-none text-gray-900 placeholder-gray-500"
                   />
-                  <p className="text-xs text-gray-500 mt-1">Concrete objectives your content should support</p>
+                  <p className="text-xs text-gray-600 mt-1">Concrete objectives your content should support</p>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-800 mb-2">
                     Target Audience *
                   </label>
                   <textarea
                     value={ikigai.audience}
                     onChange={(e) => handleChange('audience', e.target.value)}
                     placeholder="Who are you serving? What are their needs and challenges?"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 h-24 resize-none"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 h-24 resize-none text-gray-900 placeholder-gray-500"
                   />
-                  <p className="text-xs text-gray-500 mt-1">The people you&apos;re creating content for</p>
+                  <p className="text-xs text-gray-600 mt-1">The people you&apos;re creating content for</p>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-800 mb-2">
                     Brand Voice & Tone *
                   </label>
                   <textarea
                     value={ikigai.voice}
                     onChange={(e) => handleChange('voice', e.target.value)}
                     placeholder="How do you communicate? What&apos;s your unique voice?"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 h-24 resize-none"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 h-24 resize-none text-gray-900 placeholder-gray-500"
                   />
-                  <p className="text-xs text-gray-500 mt-1">Your unique communication style and personality</p>
+                  <p className="text-xs text-gray-600 mt-1">Your unique communication style and personality</p>
                 </div>
               </div>
 
