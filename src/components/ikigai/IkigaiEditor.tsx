@@ -184,7 +184,7 @@ export default function IkigaiEditor({ isOpen, onClose }: IkigaiEditorProps) {
                     placeholder="Who are you serving? What are their needs and challenges?"
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 h-24 resize-none"
                   />
-                  <p className="text-xs text-gray-500 mt-1">The people you're creating content for</p>
+                  <p className="text-xs text-gray-500 mt-1">The people you&apos;re creating content for</p>
                 </div>
 
                 <div>
