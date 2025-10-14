@@ -86,6 +86,17 @@ npm run dev
 
 Visit `http://localhost:3000` to start using the writing assistant.
 
+## 🚀 Railway Deployment
+
+For production deployment on Railway, see the detailed [Railway Deployment Guide](./RAILWAY_DEPLOY.md).
+
+**Quick Railway Setup:**
+1. Connect your GitHub repo to Railway
+2. Add PostgreSQL database service
+3. Set environment variables (OpenAI API key, Wasabi credentials)
+4. Deploy automatically
+5. Run `npm run db:deploy` to initialize database
+
 ## How to Use
 
 ### 1. Start Writing
