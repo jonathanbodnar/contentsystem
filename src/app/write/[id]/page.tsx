@@ -2,10 +2,11 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import { Save, ArrowLeft, Send, Database } from 'lucide-react'
+import { Save, ArrowLeft, Send, Database, Target } from 'lucide-react'
 import WritingEditor from '@/components/editor/WritingEditor'
 import AISuggestions from '@/components/suggestions/AISuggestions'
 import ContextManager from '@/components/context/ContextManager'
+import IkigaiEditor from '@/components/ikigai/IkigaiEditor'
 
 interface Document {
   id: string
@@ -35,6 +36,7 @@ export default function WritePage({ params }: { params: Promise<{ id: string }> 
   const [loading, setLoading] = useState(true)
   const [lastSaved, setLastSaved] = useState<Date | null>(null)
   const [showContextManager, setShowContextManager] = useState(false)
+  const [showIkigaiEditor, setShowIkigaiEditor] = useState(false)
   const autoSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const lastContentRef = useRef<string>('')
 
@@ -213,6 +215,14 @@ export default function WritePage({ params }: { params: Promise<{ id: string }> 
             )}
             
             <button
+              onClick={() => setShowIkigaiEditor(true)}
+              className="flex items-center gap-2 px-4 py-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors"
+            >
+              <Target className="w-4 h-4" />
+              Ikigai
+            </button>
+
+            <button
               onClick={() => setShowContextManager(true)}
               className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors"
             >
@@ -254,6 +264,12 @@ export default function WritePage({ params }: { params: Promise<{ id: string }> 
       <AISuggestions
         currentContent={content}
         onSuggestionClick={handleSuggestionClick}
+      />
+
+      {/* Ikigai Editor */}
+      <IkigaiEditor
+        isOpen={showIkigaiEditor}
+        onClose={() => setShowIkigaiEditor(false)}
       />
 
       {/* Context Manager Modal */}

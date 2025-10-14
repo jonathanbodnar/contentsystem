@@ -118,6 +118,20 @@ enum DocumentFormatStatus {
   REJECTED
 }
 
+model Ikigai {
+  id        String   @id @default(cuid())
+  mission   String
+  purpose   String
+  values    String
+  goals     String
+  audience  String
+  voice     String
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+  
+  @@map("ikigai")
+}
+
 enum CalendarPostStatus {
   SCHEDULED
   PUBLISHED

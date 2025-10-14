@@ -55,6 +55,13 @@ export async function POST(
       take: 5
     })
 
+    // Get Ikigai for mission-driven context
+    const ikigai = await prisma.ikigai.findFirst({
+      orderBy: {
+        updatedAt: 'desc'
+      }
+    })
+
     const contextText = contextDocs.map(doc => 
       `[${doc.filename}]\n${doc.content.slice(0, 800)}`
     ).join('\n\n')
@@ -86,7 +93,19 @@ export async function POST(
         }
       }
 
+      const ikigaiText = ikigai ? `
+IKIGAI - CORE MISSION & PURPOSE (This should guide ALL content creation):
+Mission: ${ikigai.mission}
+Purpose: ${ikigai.purpose}
+Values: ${ikigai.values}
+Goals: ${ikigai.goals}
+Target Audience: ${ikigai.audience}
+Brand Voice: ${ikigai.voice}
+` : ''
+
       const prompt = `
+${ikigaiText ? `${ikigaiText}\nIMPORTANT: All content must align with and advance the above Ikigai. This is your PRIMARY guiding principle.\n` : ''}
+
 ${format.prompt}
 
 Original content to transform:
@@ -97,7 +116,7 @@ ${contextText}
 
 ${formatContextText ? `\nFormat-specific context for ${format.platform}:\n${formatContextText}` : ''}
 
-Please transform the content according to the format requirements. Return only the formatted content, ready to post on ${format.platform}.
+Please transform the content according to the format requirements while staying true to the mission, values, and goals defined in the Ikigai. The content should serve the target audience and reflect the specified brand voice. Return only the formatted content, ready to post on ${format.platform}.
 `
 
       const response = await openai.chat.completions.create({

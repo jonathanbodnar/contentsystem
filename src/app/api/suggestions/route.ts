@@ -49,6 +49,13 @@ export async function POST(request: NextRequest) {
       }
     })
 
+    // Get Ikigai for mission-driven context
+    const ikigai = await prisma.ikigai.findFirst({
+      orderBy: {
+        updatedAt: 'desc'
+      }
+    })
+
     // Prepare context for AI
     const contextText = contextDocs.map(doc => 
       `[${doc.filename}]\n${doc.content.slice(0, 1000)}`
@@ -58,8 +65,24 @@ export async function POST(request: NextRequest) {
       `[${doc.title}]\n${doc.content.slice(0, 500)}`
     ).join('\n\n')
 
+    const ikigaiText = ikigai ? `
+IKIGAI - CORE MISSION & PURPOSE (Use this as the primary guiding context):
+Mission: ${ikigai.mission}
+Purpose: ${ikigai.purpose}
+Values: ${ikigai.values}
+Goals: ${ikigai.goals}
+Audience: ${ikigai.audience}
+Voice: ${ikigai.voice}
+` : ''
+
     const prompt = `
-Based on the current writing content and the available context, provide relevant suggestions that could enhance the writing. Look for:
+Based on the current writing content and the available context, provide relevant suggestions that could enhance the writing. 
+
+${ikigaiText ? `IMPORTANT: All suggestions should align with and support the user's Ikigai (mission and purpose). Use this as your primary guiding principle when making suggestions.
+
+${ikigaiText}` : ''}
+
+Look for:
 
 1. **Facts** - Specific data, statistics, or factual information from the context that supports the current writing
 2. **References** - Related stories, examples, or previous writings that connect to the current topic
