@@ -471,12 +471,6 @@ function FormatEditor({ format, onSave, onClose }: {
           onClose={() => setShowContextUpload(false)}
         />
       )}
-
-      {/* Global Context Manager */}
-      <ContextManager
-        isOpen={showContextManager}
-        onClose={() => setShowContextManager(false)}
-      />
     </div>
   )
 }
