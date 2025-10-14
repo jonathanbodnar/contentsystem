@@ -194,7 +194,7 @@ export default function IkigaiEditor({ isOpen, onClose }: IkigaiEditorProps) {
                   <textarea
                     value={ikigai.voice}
                     onChange={(e) => handleChange('voice', e.target.value)}
-                    placeholder="How do you communicate? What's your unique voice?"
+                    placeholder="How do you communicate? What&apos;s your unique voice?"
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 h-24 resize-none"
                   />
                   <p className="text-xs text-gray-500 mt-1">Your unique communication style and personality</p>

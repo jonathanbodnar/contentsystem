@@ -63,7 +63,7 @@ export default function ContextManager({ isOpen, onClose }: ContextManagerProps)
     try {
       // Upload files one by one to show progress
       let successCount = 0
-      let failedFiles: string[] = []
+      const failedFiles: string[] = []
 
       for (const file of fileArray) {
         try {
