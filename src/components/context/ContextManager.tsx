@@ -41,41 +41,68 @@ export default function ContextManager({ isOpen, onClose }: ContextManagerProps)
   }
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
-    if (!file) return
+    const files = event.target.files
+    if (!files || files.length === 0) return
 
     const supportedTypes = [
       'application/pdf',
       'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
     ]
 
-    if (!supportedTypes.includes(file.type)) {
-      alert('Please select a PDF or DOCX file')
+    // Validate all files
+    const fileArray = Array.from(files)
+    const invalidFiles = fileArray.filter(file => !supportedTypes.includes(file.type))
+    
+    if (invalidFiles.length > 0) {
+      alert(`Unsupported file types: ${invalidFiles.map(f => f.name).join(', ')}. Please select only PDF or DOCX files.`)
       return
     }
 
     setUploading(true)
+    
     try {
-      const formData = new FormData()
-      formData.append('file', file)
+      // Upload files one by one to show progress
+      let successCount = 0
+      let failedFiles: string[] = []
 
-      const response = await fetch('/api/context/upload', {
-        method: 'POST',
-        body: formData,
-      })
+      for (const file of fileArray) {
+        try {
+          const formData = new FormData()
+          formData.append('file', file)
 
-      if (response.ok) {
+          const response = await fetch('/api/context/upload', {
+            method: 'POST',
+            body: formData,
+          })
+
+          if (response.ok) {
+            successCount++
+          } else {
+            const error = await response.json()
+            failedFiles.push(`${file.name}: ${error.error || 'Unknown error'}`)
+          }
+        } catch (error) {
+          console.error('Upload error for', file.name, ':', error)
+          failedFiles.push(`${file.name}: Network error`)
+        }
+      }
+
+      // Show results
+      if (successCount > 0) {
         await fetchContextDocuments()
         if (fileInputRef.current) {
           fileInputRef.current.value = ''
         }
-      } else {
-        const error = await response.json()
-        alert(error.error || 'Failed to upload file')
+      }
+
+      if (failedFiles.length > 0) {
+        alert(`Upload completed. ${successCount} files uploaded successfully. Failed uploads:\n${failedFiles.join('\n')}`)
+      } else if (successCount > 0) {
+        alert(`Successfully uploaded ${successCount} file${successCount !== 1 ? 's' : ''}`)
       }
     } catch (error) {
       console.error('Upload error:', error)
-      alert('Failed to upload file')
+      alert('Failed to upload files')
     } finally {
       setUploading(false)
     }
@@ -132,10 +159,11 @@ export default function ContextManager({ isOpen, onClose }: ContextManagerProps)
                 onChange={handleFileUpload}
                 className="hidden"
                 disabled={uploading}
+                multiple
               />
               <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
               <p className="text-gray-600 mb-2">
-                Drop PDF or DOCX files here or click to browse
+                Drop PDF or DOCX files here or click to browse (multiple files supported)
               </p>
               <button
                 onClick={() => fileInputRef.current?.click()}

@@ -50,12 +50,17 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'No text content found in document' }, { status: 400 })
     }
 
-    // Generate S3 key and upload file
+    // Generate S3 key and upload file (optional for development)
     const s3Key = generateS3Key(file.name, folder)
-    const uploadResult = await uploadFile(s3Key, buffer, file.type)
-
-    if (!uploadResult.success) {
-      return NextResponse.json({ error: 'Failed to upload file to storage' }, { status: 500 })
+    let uploadResult = { success: true }
+    
+    // Only upload to S3 if credentials are configured
+    if (process.env.WASABI_ACCESS_KEY_ID && process.env.WASABI_SECRET_ACCESS_KEY) {
+      uploadResult = await uploadFile(s3Key, buffer, file.type)
+      
+      if (!uploadResult.success) {
+        return NextResponse.json({ error: 'Failed to upload file to storage' }, { status: 500 })
+      }
     }
 
     // Save to database
@@ -76,6 +81,16 @@ export async function POST(request: NextRequest) {
     })
   } catch (error) {
     console.error('Context upload error:', error)
-    return NextResponse.json({ error: 'Failed to process upload' }, { status: 500 })
+    
+    // Provide more specific error information
+    let errorMessage = 'Failed to process upload'
+    if (error instanceof Error) {
+      errorMessage = error.message
+    }
+    
+    return NextResponse.json({ 
+      error: errorMessage,
+      details: error instanceof Error ? error.stack : 'Unknown error'
+    }, { status: 500 })
   }
 }

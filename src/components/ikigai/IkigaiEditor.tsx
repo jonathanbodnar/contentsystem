@@ -206,7 +206,7 @@ export default function IkigaiEditor({ isOpen, onClose }: IkigaiEditorProps) {
                 <ul className="text-sm text-blue-700 space-y-1">
                   <li>• <strong>AI Suggestions</strong> will align with your mission and values</li>
                   <li>• <strong>Format Generation</strong> will reflect your voice and serve your goals</li>
-                  <li>• <strong>Content Recommendations</strong> will support your audience's needs</li>
+                  <li>• <strong>Content Recommendations</strong> will support your audience&apos;s needs</li>
                   <li>• <strong>All Writing</strong> will be guided by your core purpose</li>
                 </ul>
               </div>

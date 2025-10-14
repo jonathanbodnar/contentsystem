@@ -414,7 +414,7 @@ function FormatEditor({ format, onSave, onClose }: {
                       No format-specific context files
                     </p>
                     <p className="text-xs text-gray-500">
-                      Upload documents specific to this format's style and requirements
+                      Upload documents specific to this format&apos;s style and requirements
                     </p>
                   </div>
                 ) : (
