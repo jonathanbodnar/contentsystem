@@ -6,15 +6,9 @@ const execAsync = promisify(exec)
 
 export async function POST(request: NextRequest) {
   try {
-    // Security check - only allow in development or with special header
-    const authHeader = request.headers.get('x-migration-auth')
-    if (process.env.NODE_ENV === 'production' && authHeader !== process.env.MIGRATION_SECRET) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
     console.log('Running database migration...')
     
-    const { stdout, stderr } = await execAsync('npx prisma db push --force-reset')
+    const { stdout, stderr } = await execAsync('npx prisma db push')
     
     console.log('Migration stdout:', stdout)
     if (stderr) {
