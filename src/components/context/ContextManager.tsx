@@ -44,8 +44,13 @@ export default function ContextManager({ isOpen, onClose }: ContextManagerProps)
     const file = event.target.files?.[0]
     if (!file) return
 
-    if (file.type !== 'application/pdf') {
-      alert('Please select a PDF file')
+    const supportedTypes = [
+      'application/pdf',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    ]
+
+    if (!supportedTypes.includes(file.type)) {
+      alert('Please select a PDF or DOCX file')
       return
     }
 
@@ -117,20 +122,20 @@ export default function ContextManager({ isOpen, onClose }: ContextManagerProps)
           {/* Upload Section */}
           <div className="mb-6">
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Upload PDF Documents
+              Upload Documents
             </label>
             <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
               <input
                 ref={fileInputRef}
                 type="file"
-                accept=".pdf"
+                accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
                 onChange={handleFileUpload}
                 className="hidden"
                 disabled={uploading}
               />
               <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
               <p className="text-gray-600 mb-2">
-                Drop PDF files here or click to browse
+                Drop PDF or DOCX files here or click to browse
               </p>
               <button
                 onClick={() => fileInputRef.current?.click()}
@@ -157,7 +162,7 @@ export default function ContextManager({ isOpen, onClose }: ContextManagerProps)
                 <div className="text-center py-8 text-gray-500">
                   <FileText className="w-8 h-8 mx-auto mb-2 opacity-50" />
                   <p>No documents uploaded yet</p>
-                  <p className="text-sm">Upload PDFs to build your context library</p>
+                  <p className="text-sm">Upload PDFs or DOCX files to build your context library</p>
                 </div>
               ) : (
                 <div className="space-y-2">

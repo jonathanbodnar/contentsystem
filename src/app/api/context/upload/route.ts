@@ -3,6 +3,8 @@ import { prisma } from '@/lib/db'
 import { uploadFile, generateS3Key } from '@/lib/s3'
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const pdf = require('pdf-parse')
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const mammoth = require('mammoth')
 
 export async function POST(request: NextRequest) {
   try {
@@ -14,25 +16,37 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate file type
-    if (file.type !== 'application/pdf') {
-      return NextResponse.json({ error: 'Only PDF files are supported' }, { status: 400 })
+    const supportedTypes = [
+      'application/pdf',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document' // DOCX
+    ]
+    
+    if (!supportedTypes.includes(file.type)) {
+      return NextResponse.json({ error: 'Only PDF and DOCX files are supported' }, { status: 400 })
     }
 
     // Convert file to buffer
     const buffer = Buffer.from(await file.arrayBuffer())
 
-    // Extract text from PDF
+    // Extract text based on file type
     let extractedText = ''
     try {
-      const pdfData = await pdf(buffer)
-      extractedText = pdfData.text
-    } catch (pdfError) {
-      console.error('PDF parsing error:', pdfError)
-      return NextResponse.json({ error: 'Failed to extract text from PDF' }, { status: 400 })
+      if (file.type === 'application/pdf') {
+        // Extract text from PDF
+        const pdfData = await pdf(buffer)
+        extractedText = pdfData.text
+      } else if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+        // Extract text from DOCX
+        const result = await mammoth.extractRawText({ buffer })
+        extractedText = result.value
+      }
+    } catch (parseError) {
+      console.error('Document parsing error:', parseError)
+      return NextResponse.json({ error: 'Failed to extract text from document' }, { status: 400 })
     }
 
     if (!extractedText.trim()) {
-      return NextResponse.json({ error: 'No text content found in PDF' }, { status: 400 })
+      return NextResponse.json({ error: 'No text content found in document' }, { status: 400 })
     }
 
     // Generate S3 key and upload file

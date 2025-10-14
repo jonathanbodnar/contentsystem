@@ -17,7 +17,7 @@ A minimal, AI-powered writing interface that helps you create content and automa
 - Helps remember facts, stories, and ideas
 
 ### 📄 Context Database
-- Upload PDF documents to build your knowledge base
+- Upload PDF and DOCX documents to build your knowledge base
 - AI analyzes and references your personal content
 - Secure storage using Wasabi S3
 - Easy document management interface
@@ -105,9 +105,9 @@ For production deployment on Railway, see the detailed [Railway Deployment Guide
 - AI suggestions will appear on the right as you write more content
 
 ### 2. Build Your Context Database
-- Click the "Context" button in the editor header
-- Upload PDF documents containing your personal writing, stories, and context
-- The AI will reference this content to provide better suggestions
+- Click the "Context Library" button (available on all pages)
+- Upload PDF and DOCX documents containing your personal writing, stories, and context
+- The AI will reference this content to provide better suggestions across all your writing
 
 ### 3. Save and Organize
 - Documents auto-save as drafts while you write
