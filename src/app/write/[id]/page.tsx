@@ -163,16 +163,16 @@ export default function WritePage({ params }: { params: Promise<{ id: string }> 
     }
   }, [content, title])
 
-  // Auto-save title changes separately (less frequent)
-  useEffect(() => {
-    if (!title.trim()) return
+  // Disable title auto-save for now to prevent jumping
+  // useEffect(() => {
+  //   if (!title.trim()) return
     
-    const titleSaveTimeout = setTimeout(() => {
-      saveDocument()
-    }, 1000) // Title saves faster since it's less frequent
+  //   const titleSaveTimeout = setTimeout(() => {
+  //     saveDocument()
+  //   }, 1000)
 
-    return () => clearTimeout(titleSaveTimeout)
-  }, [title])
+  //   return () => clearTimeout(titleSaveTimeout)
+  // }, [title])
 
   if (loading || !resolvedParams) {
     return (

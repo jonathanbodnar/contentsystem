@@ -61,14 +61,41 @@ export async function POST(
 
     // Generate formats in parallel
     const formatPromises = formats.map(async (format) => {
+      // Get format-specific context files
+      let formatContextText = ''
+      if (format.contextFiles) {
+        try {
+          const formatContextFileNames = JSON.parse(format.contextFiles)
+          const formatContextDocs = await prisma.contextDocument.findMany({
+            where: {
+              filename: {
+                in: formatContextFileNames
+              }
+            },
+            select: {
+              filename: true,
+              content: true,
+            }
+          })
+
+          formatContextText = formatContextDocs.map(doc => 
+            `[${doc.filename}]\n${doc.content.slice(0, 800)}`
+          ).join('\n\n')
+        } catch (error) {
+          console.error('Failed to load format-specific context:', error)
+        }
+      }
+
       const prompt = `
 ${format.prompt}
 
 Original content to transform:
 ${document.content}
 
-Additional context from user's knowledge base:
+General context from user's knowledge base:
 ${contextText}
+
+${formatContextText ? `\nFormat-specific context for ${format.platform}:\n${formatContextText}` : ''}
 
 Please transform the content according to the format requirements. Return only the formatted content, ready to post on ${format.platform}.
 `

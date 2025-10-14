@@ -10,6 +10,7 @@ export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData()
     const file = formData.get('file') as File
+    const folder = formData.get('folder') as string || 'context'
 
     if (!file) {
       return NextResponse.json({ error: 'No file provided' }, { status: 400 })
@@ -50,7 +51,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Generate S3 key and upload file
-    const s3Key = generateS3Key(file.name, 'context')
+    const s3Key = generateS3Key(file.name, folder)
     const uploadResult = await uploadFile(s3Key, buffer, file.type)
 
     if (!uploadResult.success) {
