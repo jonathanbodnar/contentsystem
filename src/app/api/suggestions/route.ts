@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
 
     // Get context documents for reference
     console.log('Fetching context documents...')
-    let contextDocs = []
+    let contextDocs: Array<{ filename: string; content: string }> = []
     try {
       contextDocs = await prisma.contextDocument.findMany({
         select: {
