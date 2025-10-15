@@ -69,7 +69,8 @@ export default function WritingEditor({ content, onChange, placeholder = "Start 
             if ($from.parent.textContent.trim() === '') {
               event.preventDefault()
               // Exit the list and create a paragraph
-              const tr = state.tr.lift(selection.$from, selection.$from.depth - 1)
+              const range = { $from: selection.$from, $to: selection.$to }
+              const tr = state.tr.lift(range, selection.$from.depth - 1)
               view.dispatch(tr)
               return true
             }
@@ -83,7 +84,8 @@ export default function WritingEditor({ content, onChange, placeholder = "Start 
             if ($from.parentOffset === 0 && $from.parent.textContent.trim() === '') {
               event.preventDefault()
               // Exit the list and create a paragraph
-              const tr = state.tr.lift(selection.$from, selection.$from.depth - 1)
+              const range = { $from: selection.$from, $to: selection.$to }
+              const tr = state.tr.lift(range, selection.$from.depth - 1)
               view.dispatch(tr)
               return true
             }
