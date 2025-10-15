@@ -11,6 +11,7 @@ interface IkigaiData {
   goals: string
   audience: string
   voice: string
+  enemy: string
 }
 
 interface IkigaiEditorProps {
@@ -26,6 +27,7 @@ export default function IkigaiEditor({ isOpen, onClose }: IkigaiEditorProps) {
     goals: '',
     audience: '',
     voice: '',
+    enemy: '',
   })
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -121,7 +123,7 @@ export default function IkigaiEditor({ isOpen, onClose }: IkigaiEditorProps) {
             </div>
           ) : (
             <div className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-800 mb-2">
                     Mission Statement *
@@ -172,6 +174,19 @@ export default function IkigaiEditor({ isOpen, onClose }: IkigaiEditorProps) {
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 h-24 resize-none text-gray-900 placeholder-gray-500"
                   />
                   <p className="text-xs text-gray-600 mt-1">Concrete objectives your content should support</p>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-800 mb-2">
+                    What You Stand Against *
+                  </label>
+                  <textarea
+                    value={ikigai.enemy}
+                    onChange={(e) => handleChange('enemy', e.target.value)}
+                    placeholder="What problems, mindsets, or systems do you oppose? What are you fighting against?"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 h-24 resize-none text-gray-900 placeholder-gray-500"
+                  />
+                  <p className="text-xs text-gray-600 mt-1">The problems and opposing forces that drive your mission</p>
                 </div>
 
                 <div>

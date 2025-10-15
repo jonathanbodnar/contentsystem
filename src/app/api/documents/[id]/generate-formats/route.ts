@@ -101,6 +101,7 @@ Values: ${ikigai.values}
 Goals: ${ikigai.goals}
 Target Audience: ${ikigai.audience}
 Brand Voice: ${ikigai.voice}
+What You Stand Against: ${ikigai.enemy}
 ` : ''
 
       const prompt = `
