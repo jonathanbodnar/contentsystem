@@ -98,7 +98,7 @@ What You Stand Against: ${ikigai.enemy || 'Not specified'}
     // Get the last 200 words and current paragraph to provide better context
     const words = content.trim().split(' ')
     const recentContent = words.slice(-200).join(' ')
-    const lastSentence = content.split(/[.!?]+/).slice(-2).join('.').trim()
+    // const lastSentence = content.split(/[.!?]+/).slice(-2).join('.').trim()
     
     // Get the current paragraph they're working on
     const paragraphs = content.split('\n\n')

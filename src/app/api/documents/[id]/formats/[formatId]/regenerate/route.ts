@@ -2,10 +2,6 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { OpenAI } from 'openai'
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-})
-
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string; formatId: string }> }
@@ -13,6 +9,15 @@ export async function POST(
   try {
     const resolvedParams = await params
     const { feedback } = await request.json()
+
+    // Initialize OpenAI client at runtime
+    if (!process.env.OPENAI_API_KEY) {
+      return NextResponse.json({ error: 'OpenAI API key not configured' }, { status: 500 })
+    }
+
+    const openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+    })
 
     // Get the document format
     const documentFormat = await prisma.documentFormat.findFirst({
@@ -52,13 +57,13 @@ export async function POST(
           content: true,
         },
       })
-    } catch (error) {
+    } catch {
       console.log('Context documents table not found, continuing without context')
     }
 
     try {
       ikigai = await prisma.ikigai.findFirst()
-    } catch (error) {
+    } catch {
       console.log('Ikigai table not found, continuing without ikigai')
     }
 
@@ -78,7 +83,7 @@ export async function POST(
         take: 5, // Last 5 pieces of feedback
       })
       previousFeedback = feedbackRecords.map(f => f.feedback)
-    } catch (error) {
+    } catch {
       console.log('Format feedback table not found, continuing without previous feedback')
     }
 

@@ -188,7 +188,7 @@ Please transform the content according to the format requirements while staying 
 
     // Save generated formats to database - create multiple entries for multiple posts
     const documentFormats = await Promise.all(
-      flattenedFormats.map(({ formatId, content, postIndex }) =>
+      flattenedFormats.map(({ formatId, content }) =>
         prisma.documentFormat.create({
           data: {
             documentId: resolvedParams.id,
