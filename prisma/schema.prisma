@@ -22,6 +22,7 @@ model Document {
   versions    DocumentVersion[]
   formats     DocumentFormat[]
   playbooks   Playbook[]
+  formatFeedback FormatFeedback[]
   
   @@map("documents")
 }
@@ -64,9 +65,11 @@ model Format {
   name            String           @unique
   platform        String
   prompt          String
+  postsCount      Int              @default(1)
   contextFiles    String?          // JSON array of S3 keys
   postingRules    PostingRule[]
   documentFormats DocumentFormat[]
+  feedback        FormatFeedback[]
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
   
@@ -111,6 +114,18 @@ model CalendarPost {
   createdAt        DateTime @default(now())
   
   @@map("calendar_posts")
+}
+
+model FormatFeedback {
+  id         String   @id @default(cuid())
+  formatId   String
+  format     Format   @relation(fields: [formatId], references: [id], onDelete: Cascade)
+  documentId String
+  document   Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  feedback   String
+  createdAt  DateTime @default(now())
+  
+  @@map("format_feedback")
 }
 
 enum DocumentFormatStatus {

@@ -80,8 +80,8 @@ export async function POST(
       `[${doc.filename}]\n${doc.content.slice(0, 800)}`
     ).join('\n\n')
 
-    // Generate formats in parallel
-    const formatPromises = formats.map(async (format) => {
+    // Generate formats in parallel, creating multiple posts per format if specified
+    const formatPromises = formats.flatMap(async (format) => {
       // Get format-specific context files
       let formatContextText = ''
       if (format.contextFiles) {
@@ -120,10 +120,21 @@ Brand Voice: ${ikigai.voice}
 What You Stand Against: ${ikigai.enemy || 'Not specified'}
 ` : ''
 
-      const prompt = `
+      // Generate multiple posts for this format if postsCount > 1
+      const postsCount = format.postsCount || 1
+      const postPromises = Array.from({ length: postsCount }, async (_, index) => {
+        const prompt = `
 ${ikigaiText ? `${ikigaiText}\nIMPORTANT: All content must align with and advance the above Ikigai. This is your PRIMARY guiding principle.\n` : ''}
 
 ${format.prompt}
+
+${postsCount > 1 ? `
+IMPORTANT: You are creating post ${index + 1} of ${postsCount} unique posts from this content.
+- Each post should be completely unique and approach the content from a different angle
+- Vary the tone, focus, and specific points highlighted
+- Don't repeat the same examples or phrasing from other posts
+- Make each post valuable and standalone
+` : ''}
 
 Original content to transform:
 ${document.content}
@@ -136,47 +147,50 @@ ${formatContextText ? `\nFormat-specific context for ${format.platform}:\n${form
 Please transform the content according to the format requirements while staying true to the mission, values, and goals defined in the Ikigai. The content should serve the target audience and reflect the specified brand voice. Return only the formatted content, ready to post on ${format.platform}.
 `
 
-      const response = await openai.chat.completions.create({
-        model: 'gpt-4',
-        messages: [
-          {
-            role: 'system',
-            content: `You are a content formatting expert specializing in ${format.platform} content. Transform the provided content according to the specific requirements while maintaining the core message and value.`
-          },
-          {
-            role: 'user',
-            content: prompt
-          }
-        ],
-        max_tokens: 2000,
-        temperature: 0.7,
+        const response = await openai.chat.completions.create({
+          model: 'gpt-4',
+          messages: [
+            {
+              role: 'system',
+              content: `You are a content formatting expert specializing in ${format.platform} content. Transform the provided content according to the specific requirements while maintaining the core message and value.${postsCount > 1 ? ` You are creating unique variation ${index + 1} of ${postsCount}.` : ''}`
+            },
+            {
+              role: 'user',
+              content: prompt
+            }
+          ],
+          max_tokens: 2000,
+          temperature: 0.8, // Higher temperature for more variation when creating multiple posts
+        })
+
+        const formattedContent = response.choices[0]?.message?.content || ''
+
+        return {
+          formatId: format.id,
+          content: formattedContent,
+          postIndex: index
+        }
       })
 
-      const formattedContent = response.choices[0]?.message?.content || ''
-
-      return {
-        formatId: format.id,
-        content: formattedContent
-      }
+      return Promise.all(postPromises)
     })
 
     const generatedFormats = await Promise.all(formatPromises)
+    // Flatten the results since we now have arrays of posts per format
+    const flattenedFormats = generatedFormats.flat()
 
-    // Save generated formats to database
+    // First, delete existing document formats for this document to avoid conflicts
+    await prisma.documentFormat.deleteMany({
+      where: {
+        documentId: resolvedParams.id
+      }
+    })
+
+    // Save generated formats to database - create multiple entries for multiple posts
     const documentFormats = await Promise.all(
-      generatedFormats.map(({ formatId, content }) =>
-        prisma.documentFormat.upsert({
-          where: {
-            documentId_formatId: {
-              documentId: resolvedParams.id,
-              formatId
-            }
-          },
-          update: {
-            content,
-            status: 'PENDING'
-          },
-          create: {
+      flattenedFormats.map(({ formatId, content, postIndex }) =>
+        prisma.documentFormat.create({
+          data: {
             documentId: resolvedParams.id,
             formatId,
             content,

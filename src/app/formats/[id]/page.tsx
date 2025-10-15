@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, Check, X, Calendar, Settings, Database, Target } from 'lucide-react'
+import { ArrowLeft, Check, X, Calendar, Settings, Database, Target, RefreshCw } from 'lucide-react'
 import ContextManager from '@/components/context/ContextManager'
 import IkigaiEditor from '@/components/ikigai/IkigaiEditor'
 
@@ -38,6 +38,9 @@ export default function FormatsPage({ params }: { params: Promise<{ id: string }
   const [processing, setProcessing] = useState(false)
   const [showContextManager, setShowContextManager] = useState(false)
   const [showIkigaiEditor, setShowIkigaiEditor] = useState(false)
+  const [regenerating, setRegenerating] = useState<string | null>(null)
+  const [showFeedback, setShowFeedback] = useState<string | null>(null)
+  const [feedback, setFeedback] = useState('')
 
   // Resolve params
   useEffect(() => {
@@ -128,6 +131,39 @@ export default function FormatsPage({ params }: { params: Promise<{ id: string }
     } catch (error) {
       console.error('Failed to reject format:', error)
     }
+  }
+
+  const regenerateFormat = async (formatId: string, feedbackText?: string) => {
+    if (!resolvedParams) return
+    setRegenerating(formatId)
+    try {
+      const response = await fetch(`/api/documents/${resolvedParams.id}/formats/${formatId}/regenerate`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ feedback: feedbackText }),
+      })
+
+      if (response.ok) {
+        await fetchData()
+        setShowFeedback(null)
+        setFeedback('')
+      }
+    } catch (error) {
+      console.error('Failed to regenerate format:', error)
+    } finally {
+      setRegenerating(null)
+    }
+  }
+
+  const handleRegenerateClick = (formatId: string) => {
+    setShowFeedback(formatId)
+    setFeedback('')
+  }
+
+  const submitRegenerate = (formatId: string) => {
+    regenerateFormat(formatId, feedback)
   }
 
   if (loading || !resolvedParams) {
@@ -250,6 +286,14 @@ export default function FormatsPage({ params }: { params: Promise<{ id: string }
                       </p>
                     </div>
                     <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => handleRegenerateClick(docFormat.id)}
+                        disabled={regenerating === docFormat.id}
+                        className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors disabled:opacity-50"
+                        title="Regenerate with feedback"
+                      >
+                        <RefreshCw className={`w-4 h-4 ${regenerating === docFormat.id ? 'animate-spin' : ''}`} />
+                      </button>
                       {docFormat.status === 'PENDING' && (
                         <>
                           <button
@@ -469,6 +513,42 @@ export default function FormatsPage({ params }: { params: Promise<{ id: string }
         isOpen={showContextManager}
         onClose={() => setShowContextManager(false)}
       />
+
+      {/* Feedback Modal */}
+      {showFeedback && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+            <h3 className="text-lg font-semibold mb-4">Regenerate with Feedback</h3>
+            <p className="text-gray-600 text-sm mb-4">
+              Provide feedback to improve the regenerated content. This will be saved for future improvements.
+            </p>
+            <textarea
+              value={feedback}
+              onChange={(e) => setFeedback(e.target.value)}
+              placeholder="What would you like to improve? (e.g., 'Make it more conversational', 'Add more specific examples', 'Shorter sentences')"
+              className="w-full h-32 p-3 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            <div className="flex justify-end gap-3 mt-4">
+              <button
+                onClick={() => {
+                  setShowFeedback(null)
+                  setFeedback('')
+                }}
+                className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => submitRegenerate(showFeedback)}
+                disabled={regenerating === showFeedback}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+              >
+                {regenerating === showFeedback ? 'Regenerating...' : 'Regenerate'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

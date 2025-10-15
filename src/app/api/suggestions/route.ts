@@ -95,19 +95,33 @@ Voice: ${ikigai.voice}
 What You Stand Against: ${ikigai.enemy || 'Not specified'}
 ` : ''
 
-    // Get the last 100 words to focus on what they're writing RIGHT NOW
+    // Get the last 200 words and current paragraph to provide better context
     const words = content.trim().split(' ')
-    const recentContent = words.slice(-100).join(' ')
+    const recentContent = words.slice(-200).join(' ')
     const lastSentence = content.split(/[.!?]+/).slice(-2).join('.').trim()
+    
+    // Get the current paragraph they're working on
+    const paragraphs = content.split('\n\n')
+    const currentParagraph = paragraphs[paragraphs.length - 1]
+    
+    // Get the full document context (truncated for token limits)
+    const fullContext = content.slice(0, 2000)
 
     const prompt = `
-You are a content strategist helping the author develop their ideas. They just wrote:
+You are a content strategist helping the author develop their ideas. 
 
-"${lastSentence}"
+CURRENT DOCUMENT CONTEXT:
+${fullContext}
 
-Based on what they JUST wrote, suggest ONE specific, substantive idea they could add next. Don't ask questions - give them actual content ideas.
+CURRENT PARAGRAPH:
+${currentParagraph}
 
-${ikigaiText ? `Author's mission: ${ikigai?.mission}` : ''}
+MOST RECENT CONTENT:
+${recentContent}
+
+Based on what they've written so far and where they are in their document, suggest ONE specific, substantive idea they could add next. Look at the flow of their argument, the points they've made, and what logical next step would strengthen their content.
+
+${ikigaiText}
 
 Context available:
 ${contextText}
@@ -145,7 +159,7 @@ Give them actual IDEAS to write about, not prompts to think about.
       messages: [
         {
           role: 'system',
-          content: 'You are a writing assistant that provides contextual suggestions to enhance content. Always respond with valid JSON only.'
+          content: 'You are a writing assistant that reads the full context of what the author has written and provides specific, actionable suggestions for what they should write next. You understand the flow and structure of their argument and suggest logical next steps. Always respond with valid JSON only.'
         },
         {
           role: 'user',

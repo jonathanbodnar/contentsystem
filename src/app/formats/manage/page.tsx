@@ -12,6 +12,7 @@ interface Format {
   prompt: string
   contextFiles?: string[]
   postingRules: PostingRule[]
+  postsCount?: number
 }
 
 interface PostingRule {
@@ -238,6 +239,7 @@ function FormatEditor({ format, onSave, onClose }: {
   const [name, setName] = useState(format?.name || '')
   const [platform, setPlatform] = useState(format?.platform || '')
   const [prompt, setPrompt] = useState(format?.prompt || '')
+  const [postsCount, setPostsCount] = useState(format?.postsCount || 1)
   const [frequency, setFrequency] = useState(format?.postingRules[0]?.frequency || 1)
   const [dayOfWeek, setDayOfWeek] = useState(format?.postingRules[0]?.dayOfWeek?.toString() || '')
   const [timeOfDay, setTimeOfDay] = useState(format?.postingRules[0]?.timeOfDay || '')
@@ -257,6 +259,7 @@ function FormatEditor({ format, onSave, onClose }: {
       name,
       platform,
       prompt,
+      postsCount,
       contextFiles,
       postingRules,
     })
@@ -326,6 +329,24 @@ function FormatEditor({ format, onSave, onClose }: {
                   <option value="Medium">Medium</option>
                   <option value="Other">Other</option>
                 </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Number of Posts Per Content *
+                </label>
+                <input
+                  type="number"
+                  min="1"
+                  max="5"
+                  value={postsCount}
+                  onChange={(e) => setPostsCount(parseInt(e.target.value))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  required
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Generate multiple unique posts from one piece of content (1-5)
+                </p>
               </div>
 
               {/* Posting Rules */}
