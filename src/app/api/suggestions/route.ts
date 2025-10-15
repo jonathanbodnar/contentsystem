@@ -112,7 +112,7 @@ Based on what they JUST wrote, send ONE quick suggestion to help them continue. 
 - SHORT (8-12 words max)
 - SPECIFIC to what they actually wrote
 
-${ikigaiText ? `Author's mission context: ${ikigai.mission}` : ''}
+${ikigaiText ? `Author's mission context: ${ikigai?.mission}` : ''}
 
 Context documents available:
 ${contextText}
