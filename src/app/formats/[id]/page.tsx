@@ -306,60 +306,52 @@ export default function FormatsPage({ params }: { params: Promise<{ id: string }
                             <div className="text-sm text-gray-600 mb-3 font-medium">X (Twitter) Thread Preview:</div>
                             <div className="space-y-3">
                               {(() => {
-                                const cleanContent = docFormat.content.replace(/<[^>]*>/g, '')
-                                // Split by line breaks and look for tweet indicators
-                                const lines = cleanContent.split('\n').filter(line => line.trim())
-                                const tweets = []
+                                const cleanContent = docFormat.content.replace(/<[^>]*>/g, '').trim()
                                 
-                                let currentTweet = ''
-                                for (const line of lines) {
-                                  if (line.match(/^\d+\/\d+/) || line.match(/^Tweet \d+/) || line.match(/^\d+\./)) {
-                                    if (currentTweet.trim()) {
-                                      tweets.push(currentTweet.trim())
-                                    }
-                                    currentTweet = line.replace(/^\d+\/\d+\s*/, '').replace(/^Tweet \d+[:\s]*/, '').replace(/^\d+\.\s*/, '')
-                                  } else if (line.trim()) {
-                                    currentTweet += (currentTweet ? ' ' : '') + line
-                                  }
-                                }
-                                if (currentTweet.trim()) {
-                                  tweets.push(currentTweet.trim())
-                                }
+                                // First, try to split by clear tweet separators the AI might use
+                                let tweets = []
                                 
-                                // If no clear tweet structure, split by character count (~280 chars)
-                                if (tweets.length <= 1) {
-                                  const words = cleanContent.split(' ')
-                                  const autoTweets = []
-                                  let currentAutoTweet = ''
+                                // Look for common tweet thread patterns
+                                if (cleanContent.includes('\n\n')) {
+                                  // Split by double line breaks (most common AI pattern)
+                                  tweets = cleanContent.split('\n\n').filter(t => t.trim())
+                                } else if (cleanContent.match(/\d+\/\d+/)) {
+                                  // Split by tweet numbers like "1/5", "2/5"
+                                  tweets = cleanContent.split(/(?=\d+\/\d+)/).filter(t => t.trim())
+                                  tweets = tweets.map(tweet => tweet.replace(/^\d+\/\d+\s*/, '').trim())
+                                } else if (cleanContent.includes('Tweet ')) {
+                                  // Split by "Tweet 1:", "Tweet 2:" etc
+                                  tweets = cleanContent.split(/(?=Tweet \d+)/).filter(t => t.trim())
+                                  tweets = tweets.map(tweet => tweet.replace(/^Tweet \d+[:\s]*/, '').trim())
+                                } else {
+                                  // Fallback: smart sentence-aware splitting
+                                  const sentences = cleanContent.split(/(?<=[.!?])\s+/)
+                                  tweets = []
+                                  let currentTweet = ''
                                   
-                                  for (const word of words) {
-                                    if ((currentAutoTweet + ' ' + word).length > 280) {
-                                      if (currentAutoTweet.trim()) {
-                                        autoTweets.push(currentAutoTweet.trim())
-                                      }
-                                      currentAutoTweet = word
+                                  for (const sentence of sentences) {
+                                    const testTweet = currentTweet + (currentTweet ? ' ' : '') + sentence
+                                    if (testTweet.length <= 280) {
+                                      currentTweet = testTweet
                                     } else {
-                                      currentAutoTweet += (currentAutoTweet ? ' ' : '') + word
+                                      if (currentTweet.trim()) {
+                                        tweets.push(currentTweet.trim())
+                                      }
+                                      currentTweet = sentence
                                     }
                                   }
-                                  if (currentAutoTweet.trim()) {
-                                    autoTweets.push(currentAutoTweet.trim())
+                                  if (currentTweet.trim()) {
+                                    tweets.push(currentTweet.trim())
                                   }
-                                  
-                                  return autoTweets.map((tweet, index) => (
-                                    <div key={index} className="bg-black text-white p-4 rounded-xl max-w-sm border border-gray-700">
-                                      <div className="flex items-center gap-2 mb-2">
-                                        <div className="w-8 h-8 bg-gray-600 rounded-full"></div>
-                                        <div>
-                                          <div className="text-sm font-medium">Your Name</div>
-                                          <div className="text-xs text-gray-400">@yourhandle</div>
-                                        </div>
-                                      </div>
-                                      <div className="text-sm leading-relaxed mb-2">{tweet}</div>
-                                      <div className="text-xs text-gray-400">{index + 1}/{autoTweets.length}</div>
-                                    </div>
-                                  ))
                                 }
+                                
+                                // Remove any remaining thread indicators
+                                tweets = tweets.map(tweet => 
+                                  tweet.replace(/^\d+\/\d+\s*/, '')
+                                       .replace(/^Tweet \d+[:\s]*/, '')
+                                       .replace(/^\d+\.\s*/, '')
+                                       .trim()
+                                ).filter(tweet => tweet.length > 0)
                                 
                                 return tweets.map((tweet, index) => (
                                   <div key={index} className="bg-black text-white p-4 rounded-xl max-w-sm border border-gray-700">
