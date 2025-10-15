@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Database, Target, BookOpen } from 'lucide-react'
+import { Database, Target, BookOpen, Settings } from 'lucide-react'
 import DocumentList from '@/components/sidebar/DocumentList'
 import ContextManager from '@/components/context/ContextManager'
 import IkigaiEditor from '@/components/ikigai/IkigaiEditor'
@@ -57,6 +57,14 @@ export default function Home() {
             <BookOpen className="w-4 h-4" />
             Playbooks
           </button>
+
+          <button
+            onClick={() => router.push('/formats/manage')}
+            className="flex items-center gap-2 px-4 py-2 text-purple-600 hover:text-purple-800 hover:bg-purple-50 rounded-lg transition-colors"
+          >
+            <Settings className="w-4 h-4" />
+            Manage Formats
+          </button>
           
           <button
             onClick={() => setShowContextManager(true)}
@@ -76,7 +84,7 @@ export default function Home() {
             <p className="text-gray-600 mb-8 max-w-md">
               Select a document from the sidebar to start editing, or create a new document to begin writing.
             </p>
-            <div className="grid grid-cols-2 gap-4 max-w-lg mx-auto">
+            <div className="grid grid-cols-2 gap-4 max-w-2xl mx-auto">
               <button
                 onClick={handleNewDocument}
                 className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
@@ -96,8 +104,15 @@ export default function Home() {
                 Define Ikigai
               </button>
               <button
+                onClick={() => router.push('/formats/manage')}
+                className="px-6 py-3 border border-purple-300 text-purple-700 rounded-lg hover:bg-purple-50 transition-colors"
+              >
+                <Settings className="w-4 h-4 inline mr-2" />
+                Manage Formats
+              </button>
+              <button
                 onClick={() => setShowContextManager(true)}
-                className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors col-span-2"
               >
                 Manage Context
               </button>

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { Plus, BookOpen, FileText, Target, Database, Presentation } from 'lucide-react'
+import { Plus, BookOpen, FileText, Target, Database, Presentation, ArrowLeft } from 'lucide-react'
 import ContextManager from '@/components/context/ContextManager'
 import IkigaiEditor from '@/components/ikigai/IkigaiEditor'
 
@@ -111,7 +111,7 @@ export default function PlaybooksPage() {
               onClick={() => router.push('/')}
               className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
             >
-              ←
+              <ArrowLeft className="w-5 h-5 text-gray-600" />
             </button>
             <div>
               <h1 className="text-2xl font-semibold text-gray-800 flex items-center gap-2">
