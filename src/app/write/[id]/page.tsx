@@ -79,11 +79,23 @@ export default function WritePage({ params }: { params: Promise<{ id: string }> 
     }
   }
 
+  // Track if we've already initialized this document to prevent loops
+  const initializedDocIdRef = useRef<string | null>(null)
+
   useEffect(() => {
     if (!resolvedParams) return
     
+    // Only initialize if this is a different document
+    if (initializedDocIdRef.current === resolvedParams.id) return
+    
+    console.log('Document change detected:', { 
+      from: initializedDocIdRef.current, 
+      to: resolvedParams.id 
+    })
+    
     // Reset the document loaded flag when switching documents
     documentLoadedRef.current = false
+    initializedDocIdRef.current = resolvedParams.id
     
     if (resolvedParams.id === 'new') {
       setDocument(null)
@@ -93,7 +105,7 @@ export default function WritePage({ params }: { params: Promise<{ id: string }> 
       // Reset tracking refs for new document
       lastSavedContentRef.current = ''
       lastSavedTitleRef.current = ''
-      console.log('New document initialized')
+      console.log('New document initialized ONCE')
     } else {
       fetchDocument(resolvedParams.id)
     }
