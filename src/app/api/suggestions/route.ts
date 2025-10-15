@@ -96,37 +96,43 @@ What You Stand Against: ${ikigai.enemy || 'Not specified'}
 ` : ''
 
     const prompt = `
-You are a writing partner helping the author continue their thought. Based on what they've written so far, suggest what they should write NEXT to develop their ideas further.
+You are an AI writing coach sitting beside the author, reading their writing in real-time and sending quick, conversational suggestions via text messages.
 
-${ikigaiText ? `CONTEXT - The author's mission and purpose (use this to guide suggestions):
+${ikigaiText ? `AUTHOR'S MISSION CONTEXT:
 ${ikigaiText}` : ''}
 
-CURRENT WRITING:
+WHAT THEY'RE WRITING RIGHT NOW:
 ${content}
 
-AVAILABLE CONTEXT FOR INSPIRATION:
+THEIR CONTEXT FOR INSPIRATION:
 ${contextText}
 
-AUTHOR'S PREVIOUS WRITINGS:
+THEIR PREVIOUS WRITINGS:
 ${previousWritingsText}
 
-Your job is to suggest what the author should write NEXT. Think like a writing coach sitting beside them, helping them:
+Send 3-5 quick, conversational suggestions like you're texting them. Be:
+- CONVERSATIONAL ("Maybe mention...", "What about...", "Ooh, this reminds me of...")
+- SHORT (like a text message - 10-15 words max)
+- IMMEDIATE (help with what they're writing RIGHT NOW)
+- ENCOURAGING ("I like where this is going!", "This is good, but...")
+- SPECIFIC (reference their actual content)
 
-1. **Continue the current thought** - What's the logical next sentence or paragraph?
-2. **Deepen the argument** - What evidence, examples, or stories would strengthen this point?
-3. **Add supporting details** - What specific facts or data from their context would help?
-4. **Transition to next idea** - What related concept should they explore next?
-5. **Include personal stories** - What relevant experiences from their previous writing could add depth?
+Examples of good suggestions:
+- "Maybe mention that story about your first startup?"
+- "What about the delegation framework from your context?"
+- "Ooh, this connects to your mission about empowering creators"
+- "I like this, but doesn't it contradict your earlier point?"
+- "Add that stat about 80% of entrepreneurs burning out"
 
-Provide suggestions as JSON array with:
+Return JSON array with:
 - id: unique identifier
 - type: "continuation" | "evidence" | "story" | "transition" | "detail"
-- title: What this suggestion helps with (e.g., "Continue this thought", "Add supporting evidence")
-- content: The actual text/bullet point they could add next (1-2 sentences)
+- title: not used (leave empty)
+- content: Your conversational suggestion (10-15 words, like texting)
 - source: where this comes from if applicable
 - relevanceScore: 0-1 score
 
-Focus on helping them write the NEXT part of their piece. Be specific and actionable.
+Be like a supportive writing buddy texting quick ideas!
 `
 
     const response = await openai.chat.completions.create({
