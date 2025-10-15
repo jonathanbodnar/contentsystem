@@ -128,15 +128,15 @@ export default function AISuggestions({ currentContent, onSuggestionClick }: AIS
           {suggestions.slice(-5).map((suggestion) => (
             <div key={suggestion.id} className="flex justify-start animate-in slide-in-from-bottom duration-300">
               <div
-                className="max-w-xs bg-blue-500 text-white rounded-2xl rounded-bl-sm px-4 py-2 cursor-pointer hover:bg-blue-600 transition-colors shadow-sm"
+                className="max-w-sm bg-blue-500 text-white rounded-2xl rounded-bl-sm px-4 py-3 cursor-pointer hover:bg-blue-600 transition-colors shadow-sm"
                 onClick={() => onSuggestionClick?.(suggestion)}
               >
                 <div className="text-sm leading-relaxed">
                   {suggestion.content}
                 </div>
-                <div className="flex items-center justify-between mt-1">
+                <div className="flex items-center justify-between mt-2">
                   <div className="text-xs opacity-75">
-                    {suggestion.source === 'context' ? '📚 from your context' : '🤖 AI idea'}
+                    {suggestion.source === 'context' ? '📚 from your context' : '🧠 AI insight'}
                   </div>
                   <div className="text-xs opacity-50">
                     {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}

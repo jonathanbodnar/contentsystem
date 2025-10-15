@@ -101,41 +101,43 @@ What You Stand Against: ${ikigai.enemy || 'Not specified'}
     const lastSentence = content.split(/[.!?]+/).slice(-2).join('.').trim()
 
     const prompt = `
-You are an AI writing coach reading over the author's shoulder. They just wrote this:
+You are a content strategist helping the author develop their ideas. They just wrote:
 
 "${lastSentence}"
 
-Based on what they JUST wrote, send ONE quick suggestion to help them continue. Be:
+Based on what they JUST wrote, suggest ONE specific, substantive idea they could add next. Don't ask questions - give them actual content ideas.
 
-- DIRECTLY RELEVANT to their last sentence/thought
-- CONVERSATIONAL (like texting a friend)
-- SHORT (8-12 words max)
-- SPECIFIC to what they actually wrote
+${ikigaiText ? `Author's mission: ${ikigai?.mission}` : ''}
 
-${ikigaiText ? `Author's mission context: ${ikigai?.mission}` : ''}
-
-Context documents available:
+Context available:
 ${contextText}
 
-Recent previous writing:
+Previous writings:
 ${previousWritingsText}
 
-Examples of GOOD suggestions based on their last sentence:
-- If they wrote about failure: "Maybe share how you bounced back?"
-- If they mentioned a stat: "Got a story that proves this?"
-- If they made a claim: "What evidence supports this?"
-- If they started a list: "What's the next point?"
+Give SPECIFIC content suggestions, not generic prompts:
 
-Return ONE suggestion as JSON:
+GOOD (specific ideas):
+- If they wrote about business failure: "The 80/20 rule applies - 80% of failures come from hiring mistakes"
+- If they mentioned necessity: "Consider the 2008 financial crisis - companies that survived innovated out of necessity"
+- If they discussed scaling: "Mention the 'founder's trap' - when leaders become bottlenecks"
+- If they wrote about people: "Reference Patrick Lencioni's trust pyramid from your context"
+
+BAD (generic prompts):
+- "Can you share more about that?"
+- "What's a specific example?"
+- "Tell us more"
+
+Return ONE substantive idea as JSON:
 {
   "id": "unique_id",
   "type": "continuation",
-  "content": "your 8-12 word suggestion",
-  "source": "context" or "ai" (mark if from their context docs or AI thinking),
+  "content": "specific content idea they could add (15-25 words)",
+  "source": "context" or "ai",
   "relevanceScore": 0.9
 }
 
-Focus ONLY on their last sentence. Help them write the very next thing.
+Give them actual IDEAS to write about, not prompts to think about.
 `
 
     const response = await openai.chat.completions.create({
