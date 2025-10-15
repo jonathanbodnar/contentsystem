@@ -210,7 +210,7 @@ export default function WritePage({ params }: { params: Promise<{ id: string }> 
   // Save on page unload/visibility change
   useEffect(() => {
     const handleVisibilityChange = () => {
-      if (typeof document !== 'undefined' && document && document.hidden && (content !== lastSavedContentRef.current || title !== lastSavedTitleRef.current)) {
+      if (typeof window !== 'undefined' && typeof window.document !== 'undefined' && window.document.hidden && (content !== lastSavedContentRef.current || title !== lastSavedTitleRef.current)) {
         saveDocument()
       }
     }
@@ -221,18 +221,14 @@ export default function WritePage({ params }: { params: Promise<{ id: string }> 
       }
     }
 
-    if (typeof document !== 'undefined') {
-      document.addEventListener('visibilitychange', handleVisibilityChange)
-    }
     if (typeof window !== 'undefined') {
+      window.document.addEventListener('visibilitychange', handleVisibilityChange)
       window.addEventListener('beforeunload', handleBeforeUnload)
     }
 
     return () => {
-      if (typeof document !== 'undefined') {
-        document.removeEventListener('visibilitychange', handleVisibilityChange)
-      }
       if (typeof window !== 'undefined') {
+        window.document.removeEventListener('visibilitychange', handleVisibilityChange)
         window.removeEventListener('beforeunload', handleBeforeUnload)
       }
     }
@@ -248,12 +244,12 @@ export default function WritePage({ params }: { params: Promise<{ id: string }> 
       }
     }
 
-    if (typeof document !== 'undefined') {
-      document.addEventListener('keydown', handleKeyDown)
+    if (typeof window !== 'undefined') {
+      window.document.addEventListener('keydown', handleKeyDown)
     }
     return () => {
-      if (typeof document !== 'undefined') {
-        document.removeEventListener('keydown', handleKeyDown)
+      if (typeof window !== 'undefined') {
+        window.document.removeEventListener('keydown', handleKeyDown)
       }
     }
   }, [saveDocument])
