@@ -510,7 +510,11 @@ function FormatContextUpload({ onFileSelected, onClose }: {
         onFileSelected(file.name)
       } else {
         const error = await response.json()
-        alert(error.error || 'Failed to upload file')
+        console.error('Upload error response:', error)
+        const errorMessage = error.details ? 
+          `${error.error}: ${error.details}` : 
+          (error.error || 'Failed to upload file')
+        alert(errorMessage)
       }
     } catch (error) {
       console.error('Upload error:', error)

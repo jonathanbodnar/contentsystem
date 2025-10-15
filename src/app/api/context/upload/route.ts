@@ -33,17 +33,36 @@ export async function POST(request: NextRequest) {
     let extractedText = ''
     try {
       if (file.type === 'application/pdf') {
-        // Extract text from PDF
-        const pdfData = await pdf(buffer)
-        extractedText = pdfData.text
+        console.log('Processing PDF file:', file.name, 'Size:', buffer.length)
+        try {
+          // Extract text from PDF
+          const pdfData = await pdf(buffer)
+          console.log('PDF parsed successfully, text length:', pdfData.text?.length || 0)
+          extractedText = pdfData.text || ''
+        } catch (pdfError) {
+          console.error('PDF parsing failed with pdf-parse:', pdfError)
+          // For now, we'll still throw the error, but we could add alternative PDF libraries here
+          throw pdfError
+        }
       } else if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+        console.log('Processing DOCX file:', file.name, 'Size:', buffer.length)
         // Extract text from DOCX
         const result = await mammoth.extractRawText({ buffer })
-        extractedText = result.value
+        console.log('DOCX parsed successfully, text length:', result.value?.length || 0)
+        extractedText = result.value || ''
       }
     } catch (parseError) {
       console.error('Document parsing error:', parseError)
-      return NextResponse.json({ error: 'Failed to extract text from document' }, { status: 400 })
+      console.error('File details:', {
+        name: file.name,
+        type: file.type,
+        size: file.size,
+        bufferLength: buffer.length
+      })
+      return NextResponse.json({ 
+        error: 'Failed to extract text from document', 
+        details: parseError instanceof Error ? parseError.message : 'Unknown parsing error'
+      }, { status: 400 })
     }
 
     if (!extractedText.trim()) {
