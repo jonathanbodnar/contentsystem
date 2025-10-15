@@ -68,10 +68,11 @@ export default function WritingEditor({ content, onChange, placeholder = "Start 
             // If the current list item is empty, exit the list
             if ($from.parent.textContent.trim() === '') {
               event.preventDefault()
-              // Exit the list and create a paragraph
-              const range = { $from: selection.$from, $to: selection.$to }
-              const tr = state.tr.lift(range, selection.$from.depth - 1)
-              view.dispatch(tr)
+              // Use the editor commands to exit the list
+              const editor = view.editor
+              if (editor) {
+                editor.chain().focus().liftListItem('listItem').run()
+              }
               return true
             }
           }
@@ -83,10 +84,11 @@ export default function WritingEditor({ content, onChange, placeholder = "Start 
             // If at the start of an empty list item, exit the list
             if ($from.parentOffset === 0 && $from.parent.textContent.trim() === '') {
               event.preventDefault()
-              // Exit the list and create a paragraph
-              const range = { $from: selection.$from, $to: selection.$to }
-              const tr = state.tr.lift(range, selection.$from.depth - 1)
-              view.dispatch(tr)
+              // Use the editor commands to exit the list
+              const editor = view.editor
+              if (editor) {
+                editor.chain().focus().liftListItem('listItem').run()
+              }
               return true
             }
           }
