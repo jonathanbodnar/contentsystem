@@ -29,14 +29,19 @@ export async function POST(request: NextRequest) {
 
     // Get context documents for reference
     console.log('Fetching context documents...')
-    const contextDocs = await prisma.contextDocument.findMany({
-      select: {
-        filename: true,
-        content: true,
-      },
-      take: 10 // Limit to most recent for performance
-    })
-    console.log('Found context documents:', contextDocs.length)
+    let contextDocs = []
+    try {
+      contextDocs = await prisma.contextDocument.findMany({
+        select: {
+          filename: true,
+          content: true,
+        },
+        take: 10 // Limit to most recent for performance
+      })
+      console.log('Found context documents:', contextDocs.length)
+    } catch (contextError) {
+      console.error('Error fetching context documents (table might not exist):', contextError)
+    }
 
     // Get user's previous writings for reference
     const previousWritings = await prisma.document.findMany({
@@ -57,11 +62,18 @@ export async function POST(request: NextRequest) {
     })
 
     // Get Ikigai for mission-driven context
-    const ikigai = await prisma.ikigai.findFirst({
-      orderBy: {
-        updatedAt: 'desc'
-      }
-    })
+    console.log('Fetching Ikigai...')
+    let ikigai = null
+    try {
+      ikigai = await prisma.ikigai.findFirst({
+        orderBy: {
+          updatedAt: 'desc'
+        }
+      })
+      console.log('Ikigai found:', !!ikigai)
+    } catch (ikigaiError) {
+      console.error('Error fetching Ikigai (table might not exist):', ikigaiError)
+    }
 
     // Prepare context for AI
     const contextText = contextDocs.map(doc => 
