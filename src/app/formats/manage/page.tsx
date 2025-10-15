@@ -303,14 +303,19 @@ function FormatEditor({ format, onSave, onClose }: {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Format Name *
                 </label>
-                <input
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="e.g., LinkedIn Post"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
-                  required
-                />
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="e.g., LinkedIn Post"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 pr-20"
+                    required
+                  />
+                  <div className="absolute right-2 top-1/2 transform -translate-y-1/2 text-xs text-gray-400">
+                    {name.length}/50
+                  </div>
+                </div>
               </div>
 
               <div>
@@ -411,13 +416,18 @@ function FormatEditor({ format, onSave, onClose }: {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Format Prompt *
                 </label>
-                <textarea
-                  value={prompt}
-                  onChange={(e) => setPrompt(e.target.value)}
-                  placeholder="Describe how content should be formatted for this platform..."
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 h-48 resize-none text-gray-900"
-                  required
-                />
+                <div className="relative">
+                  <textarea
+                    value={prompt}
+                    onChange={(e) => setPrompt(e.target.value)}
+                    placeholder="Describe how content should be formatted for this platform..."
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 h-48 resize-none text-gray-900"
+                    required
+                  />
+                  <div className="absolute bottom-2 right-2 text-xs text-gray-400 bg-white px-1">
+                    {prompt.length} characters
+                  </div>
+                </div>
                 <p className="text-xs text-gray-500 mt-1">
                   Describe the style, tone, length, and specific requirements for this platform
                 </p>

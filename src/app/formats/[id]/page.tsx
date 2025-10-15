@@ -518,16 +518,21 @@ export default function FormatsPage({ params }: { params: Promise<{ id: string }
       {showFeedback && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-            <h3 className="text-lg font-semibold mb-4">Regenerate with Feedback</h3>
+            <h3 className="text-lg font-semibold mb-4 text-gray-900">Regenerate with Feedback</h3>
             <p className="text-gray-600 text-sm mb-4">
               Provide feedback to improve the regenerated content. This will be saved for future improvements.
             </p>
-            <textarea
-              value={feedback}
-              onChange={(e) => setFeedback(e.target.value)}
-              placeholder="What would you like to improve? (e.g., 'Make it more conversational', 'Add more specific examples', 'Shorter sentences')"
-              className="w-full h-32 p-3 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+            <div className="relative">
+              <textarea
+                value={feedback}
+                onChange={(e) => setFeedback(e.target.value)}
+                placeholder="What would you like to improve? (e.g., 'Make it more conversational', 'Add more specific examples', 'Shorter sentences')"
+                className="w-full h-32 p-3 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
+              />
+              <div className="absolute bottom-2 right-2 text-xs text-gray-400 bg-white px-1">
+                {feedback.length} characters
+              </div>
+            </div>
             <div className="flex justify-end gap-3 mt-4">
               <button
                 onClick={() => {
