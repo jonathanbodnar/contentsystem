@@ -308,7 +308,7 @@ function FormatEditor({ format, onSave, onClose }: {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="e.g., LinkedIn Post"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
                   required
                 />
               </div>
@@ -320,7 +320,7 @@ function FormatEditor({ format, onSave, onClose }: {
                 <select
                   value={platform}
                   onChange={(e) => setPlatform(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
                   required
                 >
                   <option value="">Select platform</option>
@@ -345,7 +345,7 @@ function FormatEditor({ format, onSave, onClose }: {
                   max="5"
                   value={postsCount}
                   onChange={(e) => setPostsCount(parseInt(e.target.value))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
                   required
                 />
                 <p className="text-xs text-gray-500 mt-1">
@@ -368,7 +368,7 @@ function FormatEditor({ format, onSave, onClose }: {
                       max="21"
                       value={frequency}
                       onChange={(e) => setFrequency(parseInt(e.target.value))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
                       required
                     />
                   </div>
@@ -380,7 +380,7 @@ function FormatEditor({ format, onSave, onClose }: {
                     <select
                       value={dayOfWeek}
                       onChange={(e) => setDayOfWeek(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
                     >
                       {days.map((day) => (
                         <option key={day.value} value={day.value}>
@@ -398,7 +398,7 @@ function FormatEditor({ format, onSave, onClose }: {
                       type="time"
                       value={timeOfDay}
                       onChange={(e) => setTimeOfDay(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
                     />
                   </div>
                 </div>
@@ -415,7 +415,7 @@ function FormatEditor({ format, onSave, onClose }: {
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
                   placeholder="Describe how content should be formatted for this platform..."
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 h-48 resize-none"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 h-48 resize-none text-gray-900"
                   required
                 />
                 <p className="text-xs text-gray-500 mt-1">
