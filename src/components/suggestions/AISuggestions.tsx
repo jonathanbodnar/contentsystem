@@ -22,19 +22,25 @@ export default function AISuggestions({ currentContent, onSuggestionClick }: AIS
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    if (!currentContent || currentContent.length < 50) {
+    // Lower threshold and add debugging
+    const contentLength = currentContent?.length || 0
+    console.log('AISuggestions content check:', { contentLength, hasContent: !!currentContent })
+    
+    if (!currentContent || contentLength < 20) { // Lowered from 50 to 20
       setSuggestions([])
       return
     }
 
+    console.log('Scheduling suggestions fetch for content:', contentLength, 'characters')
     const debounceTimer = setTimeout(() => {
       fetchSuggestions(currentContent)
-    }, 1000)
+    }, 2000) // Increased to 2 seconds to reduce API calls
 
     return () => clearTimeout(debounceTimer)
   }, [currentContent])
 
   const fetchSuggestions = async (content: string) => {
+    console.log('Fetching suggestions for content:', content.substring(0, 100) + '...')
     setLoading(true)
     try {
       const response = await fetch('/api/suggestions', {
@@ -45,9 +51,22 @@ export default function AISuggestions({ currentContent, onSuggestionClick }: AIS
         body: JSON.stringify({ content }),
       })
       
+      console.log('Suggestions API response:', { 
+        status: response.status, 
+        ok: response.ok 
+      })
+      
       if (response.ok) {
         const data = await response.json()
+        console.log('Suggestions received:', data.suggestions?.length || 0, 'suggestions')
         setSuggestions(data.suggestions || [])
+        
+        if (data.error) {
+          console.warn('Suggestions API warning:', data.error)
+        }
+      } else {
+        const errorData = await response.json()
+        console.error('Suggestions API error:', errorData)
       }
     } catch (error) {
       console.error('Failed to fetch suggestions:', error)

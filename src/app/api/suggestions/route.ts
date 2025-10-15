@@ -6,23 +6,29 @@ export async function POST(request: NextRequest) {
   try {
     const { content } = await request.json()
 
-    if (!content || content.length < 50) {
+    console.log('Suggestions API called with content length:', content?.length || 0)
+    
+    if (!content || content.length < 20) {
+      console.log('Content too short for suggestions, returning empty')
       return NextResponse.json({ suggestions: [] })
     }
 
     // Initialize OpenAI client at runtime
     if (!process.env.OPENAI_API_KEY) {
+      console.log('OpenAI API key not configured')
       return NextResponse.json({ 
         suggestions: [],
         error: 'OpenAI API key not configured' 
       })
     }
 
+    console.log('OpenAI API key found, initializing client')
     const openai = new OpenAI({
       apiKey: process.env.OPENAI_API_KEY,
     })
 
     // Get context documents for reference
+    console.log('Fetching context documents...')
     const contextDocs = await prisma.contextDocument.findMany({
       select: {
         filename: true,
@@ -30,6 +36,7 @@ export async function POST(request: NextRequest) {
       },
       take: 10 // Limit to most recent for performance
     })
+    console.log('Found context documents:', contextDocs.length)
 
     // Get user's previous writings for reference
     const previousWritings = await prisma.document.findMany({
