@@ -1,11 +1,11 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Lightbulb, FileText, Quote } from 'lucide-react'
+import { Lightbulb, FileText, Quote, ArrowRight, Bookmark } from 'lucide-react'
 
 interface Suggestion {
   id: string
-  type: 'fact' | 'reference' | 'idea'
+  type: 'continuation' | 'evidence' | 'story' | 'transition' | 'detail'
   title: string
   content: string
   source?: string
@@ -26,7 +26,7 @@ export default function AISuggestions({ currentContent, onSuggestionClick }: AIS
     const contentLength = currentContent?.length || 0
     console.log('AISuggestions content check:', { contentLength, hasContent: !!currentContent })
     
-    if (!currentContent || contentLength < 20) { // Lowered from 50 to 20
+    if (!currentContent || contentLength < 15) { // Lowered to 15 for faster suggestions
       setSuggestions([])
       return
     }
@@ -77,14 +77,18 @@ export default function AISuggestions({ currentContent, onSuggestionClick }: AIS
 
   const getSuggestionIcon = (type: Suggestion['type']) => {
     switch (type) {
-      case 'fact':
-        return <FileText className="w-4 h-4 text-blue-500" />
-      case 'reference':
-        return <Quote className="w-4 h-4 text-green-500" />
-      case 'idea':
-        return <Lightbulb className="w-4 h-4 text-yellow-500" />
+      case 'continuation':
+        return <ArrowRight className="w-4 h-4 text-blue-500" />
+      case 'evidence':
+        return <FileText className="w-4 h-4 text-green-500" />
+      case 'story':
+        return <Quote className="w-4 h-4 text-purple-500" />
+      case 'transition':
+        return <ArrowRight className="w-4 h-4 text-orange-500" />
+      case 'detail':
+        return <Bookmark className="w-4 h-4 text-yellow-500" />
       default:
-        return <FileText className="w-4 h-4 text-gray-500" />
+        return <Lightbulb className="w-4 h-4 text-gray-500" />
     }
   }
 
@@ -100,9 +104,10 @@ export default function AISuggestions({ currentContent, onSuggestionClick }: AIS
   return (
     <div className="w-80 bg-white border-l border-gray-100 p-6 overflow-y-auto max-h-screen">
       <div className="mb-4">
-        <h3 className="text-sm font-medium text-gray-700 mb-2">Contextual Suggestions</h3>
+        <h3 className="text-sm font-medium text-gray-700 mb-2">What to Write Next</h3>
+        <p className="text-xs text-gray-500 mb-2">AI suggestions for continuing your thought</p>
         {loading && (
-          <div className="text-xs text-gray-500">Analyzing your content...</div>
+          <div className="text-xs text-blue-500 animate-pulse">Thinking of what to say next...</div>
         )}
       </div>
 
@@ -115,13 +120,15 @@ export default function AISuggestions({ currentContent, onSuggestionClick }: AIS
           >
             <div className="flex items-start gap-2 mb-1">
               {getSuggestionIcon(suggestion.type)}
-              <h4 className="text-sm font-medium text-gray-800 flex-1 leading-tight">
-                {suggestion.title}
-              </h4>
+              <div className="flex-1">
+                <h4 className="text-xs font-medium text-gray-600 mb-1">
+                  {suggestion.title}
+                </h4>
+                <p className="text-sm text-gray-800 leading-relaxed">
+                  • {suggestion.content}
+                </p>
+              </div>
             </div>
-            <p className="text-xs text-gray-600 leading-relaxed pl-6">
-              {suggestion.content}
-            </p>
             {suggestion.source && (
               <p className="text-xs text-gray-400 mt-1 pl-6">
                 from: {suggestion.source}

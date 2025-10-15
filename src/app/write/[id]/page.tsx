@@ -194,8 +194,16 @@ export default function WritePage({ params }: { params: Promise<{ id: string }> 
   }, [resolvedParams, content, title, router])
 
   const handleSuggestionClick = (suggestion: Suggestion) => {
-    // Insert suggestion at the end of the current content
-    const newContent = content + '\n\n' + suggestion.content
+    // Insert suggestion as a new paragraph at the end
+    const suggestionText = suggestion.content.startsWith('•') 
+      ? suggestion.content 
+      : `• ${suggestion.content}`
+    
+    const newContent = content.trim() 
+      ? content + '\n\n' + suggestionText
+      : suggestionText
+    
+    console.log('Adding suggestion:', suggestion.title)
     setContent(newContent)
   }
 

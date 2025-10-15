@@ -8,7 +8,7 @@ export async function POST(request: NextRequest) {
 
     console.log('Suggestions API called with content length:', content?.length || 0)
     
-    if (!content || content.length < 20) {
+    if (!content || content.length < 15) {
       console.log('Content too short for suggestions, returning empty')
       return NextResponse.json({ suggestions: [] })
     }
@@ -96,36 +96,37 @@ What You Stand Against: ${ikigai.enemy || 'Not specified'}
 ` : ''
 
     const prompt = `
-Based on the current writing content and the available context, provide relevant suggestions that could enhance the writing. 
+You are a writing partner helping the author continue their thought. Based on what they've written so far, suggest what they should write NEXT to develop their ideas further.
 
-${ikigaiText ? `IMPORTANT: All suggestions should align with and support the user's Ikigai (mission and purpose). Use this as your primary guiding principle when making suggestions.
-
+${ikigaiText ? `CONTEXT - The author's mission and purpose (use this to guide suggestions):
 ${ikigaiText}` : ''}
 
-Look for:
-
-1. **Facts** - Specific data, statistics, or factual information from the context that supports the current writing
-2. **References** - Related stories, examples, or previous writings that connect to the current topic
-3. **Ideas** - Creative connections, angles, or perspectives that could enrich the content
-
-Current writing content:
+CURRENT WRITING:
 ${content}
 
-Available context documents:
+AVAILABLE CONTEXT FOR INSPIRATION:
 ${contextText}
 
-Previous writings:
+AUTHOR'S PREVIOUS WRITINGS:
 ${previousWritingsText}
 
-Provide suggestions in JSON format as an array of objects with:
-- id: unique identifier
-- type: "fact" | "reference" | "idea"
-- title: brief descriptive title
-- content: the suggestion content (2-3 sentences max)
-- source: source document name if applicable
-- relevanceScore: 0-1 score of relevance
+Your job is to suggest what the author should write NEXT. Think like a writing coach sitting beside them, helping them:
 
-Return only the most relevant 5-8 suggestions. Focus on quality over quantity.
+1. **Continue the current thought** - What's the logical next sentence or paragraph?
+2. **Deepen the argument** - What evidence, examples, or stories would strengthen this point?
+3. **Add supporting details** - What specific facts or data from their context would help?
+4. **Transition to next idea** - What related concept should they explore next?
+5. **Include personal stories** - What relevant experiences from their previous writing could add depth?
+
+Provide suggestions as JSON array with:
+- id: unique identifier
+- type: "continuation" | "evidence" | "story" | "transition" | "detail"
+- title: What this suggestion helps with (e.g., "Continue this thought", "Add supporting evidence")
+- content: The actual text/bullet point they could add next (1-2 sentences)
+- source: where this comes from if applicable
+- relevanceScore: 0-1 score
+
+Focus on helping them write the NEXT part of their piece. Be specific and actionable.
 `
 
     const response = await openai.chat.completions.create({
