@@ -22,13 +22,14 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { name, platform, prompt, contextFiles, postingRules } = body
+    const { name, platform, prompt, postsCount, contextFiles, postingRules } = body
 
     const format = await prisma.format.create({
       data: {
         name,
         platform,
         prompt,
+        postsCount: postsCount || 1,
         contextFiles: contextFiles ? JSON.stringify(contextFiles) : null,
         postingRules: {
           create: postingRules || []

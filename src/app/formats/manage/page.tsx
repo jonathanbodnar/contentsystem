@@ -45,10 +45,14 @@ export default function FormatManagePage() {
       const response = await fetch('/api/formats')
       if (response.ok) {
         const data = await response.json()
-        setFormats(data.formats)
+        setFormats(Array.isArray(data.formats) ? data.formats : [])
+      } else {
+        console.error('Failed to fetch formats:', response.status)
+        setFormats([])
       }
     } catch (error) {
       console.error('Failed to fetch formats:', error)
+      setFormats([])
     } finally {
       setLoading(false)
     }

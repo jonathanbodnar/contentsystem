@@ -8,7 +8,7 @@ export async function PUT(
   try {
     const resolvedParams = await params
     const body = await request.json()
-    const { name, platform, prompt, contextFiles, postingRules } = body
+    const { name, platform, prompt, postsCount, contextFiles, postingRules } = body
 
     // Delete existing posting rules
     await prisma.postingRule.deleteMany({
@@ -22,6 +22,7 @@ export async function PUT(
         name,
         platform,
         prompt,
+        postsCount: postsCount || 1,
         contextFiles: contextFiles ? JSON.stringify(contextFiles) : null,
         postingRules: {
           create: postingRules || []
