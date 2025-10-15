@@ -33,7 +33,14 @@ export async function PUT(
       }
     })
 
-    return NextResponse.json({ format })
+    // Parse contextFiles for response
+    const formatWithParsedContext = {
+      ...format,
+      contextFiles: format.contextFiles ? JSON.parse(format.contextFiles) : [],
+      postsCount: format.postsCount || 1
+    }
+
+    return NextResponse.json({ format: formatWithParsedContext })
   } catch (error) {
     console.error('Error updating format:', error)
     return NextResponse.json({ error: 'Failed to update format' }, { status: 500 })

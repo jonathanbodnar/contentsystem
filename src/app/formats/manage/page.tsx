@@ -222,7 +222,7 @@ function FormatCard({ format, onEdit, onDelete }: {
           </p>
         </div>
 
-        {format.contextFiles && format.contextFiles.length > 0 && (
+        {format.contextFiles && Array.isArray(format.contextFiles) && format.contextFiles.length > 0 && (
           <div>
             <p className="text-xs font-medium text-gray-700 mb-1">Context Files</p>
             <p className="text-sm text-gray-600">
