@@ -307,11 +307,46 @@ export default function FormatsPage({ params }: { params: Promise<{ id: string }
                             <div className="space-y-3">
                               {(() => {
                                 const cleanContent = docFormat.content.replace(/<[^>]*>/g, '')
-                                const tweets = cleanContent.split(/(?=\d+\/\d+)/).filter(tweet => tweet.trim())
+                                // Split by line breaks and look for tweet indicators
+                                const lines = cleanContent.split('\n').filter(line => line.trim())
+                                const tweets = []
                                 
-                                return tweets.map((tweet, index) => {
-                                  const tweetText = tweet.replace(/^\d+\/\d+\s*/, '').trim()
-                                  return (
+                                let currentTweet = ''
+                                for (const line of lines) {
+                                  if (line.match(/^\d+\/\d+/) || line.match(/^Tweet \d+/) || line.match(/^\d+\./)) {
+                                    if (currentTweet.trim()) {
+                                      tweets.push(currentTweet.trim())
+                                    }
+                                    currentTweet = line.replace(/^\d+\/\d+\s*/, '').replace(/^Tweet \d+[:\s]*/, '').replace(/^\d+\.\s*/, '')
+                                  } else if (line.trim()) {
+                                    currentTweet += (currentTweet ? ' ' : '') + line
+                                  }
+                                }
+                                if (currentTweet.trim()) {
+                                  tweets.push(currentTweet.trim())
+                                }
+                                
+                                // If no clear tweet structure, split by character count (~280 chars)
+                                if (tweets.length <= 1) {
+                                  const words = cleanContent.split(' ')
+                                  const autoTweets = []
+                                  let currentAutoTweet = ''
+                                  
+                                  for (const word of words) {
+                                    if ((currentAutoTweet + ' ' + word).length > 280) {
+                                      if (currentAutoTweet.trim()) {
+                                        autoTweets.push(currentAutoTweet.trim())
+                                      }
+                                      currentAutoTweet = word
+                                    } else {
+                                      currentAutoTweet += (currentAutoTweet ? ' ' : '') + word
+                                    }
+                                  }
+                                  if (currentAutoTweet.trim()) {
+                                    autoTweets.push(currentAutoTweet.trim())
+                                  }
+                                  
+                                  return autoTweets.map((tweet, index) => (
                                     <div key={index} className="bg-black text-white p-4 rounded-xl max-w-sm border border-gray-700">
                                       <div className="flex items-center gap-2 mb-2">
                                         <div className="w-8 h-8 bg-gray-600 rounded-full"></div>
@@ -320,11 +355,25 @@ export default function FormatsPage({ params }: { params: Promise<{ id: string }
                                           <div className="text-xs text-gray-400">@yourhandle</div>
                                         </div>
                                       </div>
-                                      <div className="text-sm leading-relaxed mb-2">{tweetText}</div>
-                                      <div className="text-xs text-gray-400">{index + 1}/{tweets.length}</div>
+                                      <div className="text-sm leading-relaxed mb-2">{tweet}</div>
+                                      <div className="text-xs text-gray-400">{index + 1}/{autoTweets.length}</div>
                                     </div>
-                                  )
-                                })
+                                  ))
+                                }
+                                
+                                return tweets.map((tweet, index) => (
+                                  <div key={index} className="bg-black text-white p-4 rounded-xl max-w-sm border border-gray-700">
+                                    <div className="flex items-center gap-2 mb-2">
+                                      <div className="w-8 h-8 bg-gray-600 rounded-full"></div>
+                                      <div>
+                                        <div className="text-sm font-medium">Your Name</div>
+                                        <div className="text-xs text-gray-400">@yourhandle</div>
+                                      </div>
+                                    </div>
+                                    <div className="text-sm leading-relaxed mb-2">{tweet}</div>
+                                    <div className="text-xs text-gray-400">{index + 1}/{tweets.length}</div>
+                                  </div>
+                                ))
                               })()}
                             </div>
                           </div>
@@ -345,21 +394,23 @@ export default function FormatsPage({ params }: { params: Promise<{ id: string }
                                 </div>
                               </div>
                               <div className="p-6 max-h-64 overflow-y-auto">
-                                <div className="space-y-4 text-gray-900 leading-relaxed">
-                                  {(() => {
-                                    const emailContent = docFormat.content
-                                      .replace(/<[^>]*>/g, '')
-                                      .split('\n')
-                                      .filter(line => line.trim() && !line.toLowerCase().includes('subject'))
-                                      .join('\n')
-                                    
-                                    return emailContent.split('\n\n').map((paragraph, index) => (
-                                      <p key={index} className="mb-4 last:mb-0">
-                                        {paragraph.trim()}
-                                      </p>
-                                    ))
-                                  })()}
-                                </div>
+                                <div 
+                                  className="prose prose-sm max-w-none text-gray-900"
+                                  style={{ 
+                                    lineHeight: '1.7',
+                                    fontSize: '15px'
+                                  }}
+                                  dangerouslySetInnerHTML={{ 
+                                    __html: docFormat.content
+                                      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Convert **bold** to <strong>
+                                      .replace(/\*(.*?)\*/g, '<em>$1</em>') // Convert *italic* to <em>
+                                      .replace(/\n\n/g, '</p><p>') // Convert double line breaks to paragraphs
+                                      .replace(/\n/g, '<br>') // Convert single line breaks to <br>
+                                      .replace(/^/, '<p>') // Add opening paragraph
+                                      .replace(/$/, '</p>') // Add closing paragraph
+                                      .replace(/<p><\/p>/g, '') // Remove empty paragraphs
+                                  }}
+                                />
                               </div>
                             </div>
                           </div>
