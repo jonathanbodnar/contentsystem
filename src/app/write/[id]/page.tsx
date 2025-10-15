@@ -7,7 +7,6 @@ import WritingEditor from '@/components/editor/WritingEditor'
 import AISuggestions from '@/components/suggestions/AISuggestions'
 import ContextManager from '@/components/context/ContextManager'
 import IkigaiEditor from '@/components/ikigai/IkigaiEditor'
-import TitleInput from '@/components/TitleInput'
 
 interface Document {
   id: string
@@ -56,12 +55,19 @@ export default function WritePage({ params }: { params: Promise<{ id: string }> 
       if (response.ok) {
         const data = await response.json()
         setDocument(data.document)
-        setContent(data.document.content || '')
         
-        // Always set title and content when fetching document
-        setTitle(data.document.title || '')
+        // Set title and content from document
+        const docTitle = data.document.title || ''
+        const docContent = data.document.content || ''
+        setTitle(docTitle)
+        setContent(docContent)
         documentLoadedRef.current = true
-        console.log('Document loaded:', { title: data.document.title, content: data.document.content?.length })
+        console.log('Document loaded and state set:', { 
+          docTitle, 
+          docContentLength: docContent.length,
+          stateTitle: title,
+          stateContentLength: content.length
+        })
       } else {
         router.push('/')
       }
@@ -317,13 +323,17 @@ export default function WritePage({ params }: { params: Promise<{ id: string }> 
             >
               <ArrowLeft className="w-5 h-5 text-gray-600" />
             </button>
-            <TitleInput
-              initialValue={title}
-              onTitleChange={(newTitle) => {
-                console.log('Title changing to:', newTitle)
-                setTitle(newTitle)
+            <input
+              type="text"
+              value={title}
+              onChange={(e) => {
+                console.log('Direct title change:', e.target.value)
+                setTitle(e.target.value)
               }}
               placeholder="Document title..."
+              className="text-xl font-semibold bg-transparent border-none outline-none text-gray-800 placeholder-gray-400 flex-1 min-w-0"
+              autoComplete="off"
+              spellCheck="false"
             />
           </div>
 
