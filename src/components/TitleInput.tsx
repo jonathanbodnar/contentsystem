@@ -13,11 +13,11 @@ export default function TitleInput({ initialValue, onTitleChange, placeholder = 
   const inputRef = useRef<HTMLInputElement>(null)
   const initializedRef = useRef(false)
 
-  // Only set initial value once
+  // Update local title when initial value changes (like after document load)
   useEffect(() => {
-    if (!initializedRef.current && initialValue) {
+    if (initialValue !== localTitle) {
       setLocalTitle(initialValue)
-      initializedRef.current = true
+      console.log('TitleInput updated:', { initialValue, localTitle })
     }
   }, [initialValue])
 

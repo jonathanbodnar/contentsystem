@@ -58,11 +58,9 @@ export default function WritePage({ params }: { params: Promise<{ id: string }> 
         setDocument(data.document)
         setContent(data.document.content || '')
         
-        // Only set title on initial load, not on subsequent fetches
-        if (!documentLoadedRef.current) {
-          setTitle(data.document.title || '')
-          documentLoadedRef.current = true
-        }
+        // Always set title and content when fetching document
+        setTitle(data.document.title || '')
+        documentLoadedRef.current = true
         console.log('Document loaded:', { title: data.document.title, content: data.document.content?.length })
       } else {
         router.push('/')
@@ -132,8 +130,12 @@ export default function WritePage({ params }: { params: Promise<{ id: string }> 
 
         if (response.ok) {
           const data = await response.json()
-          router.replace(`/write/${data.document.id}`)
           setDocument(data.document)
+          // Update our tracking refs immediately after successful save
+          lastSavedContentRef.current = content
+          lastSavedTitleRef.current = title
+          // Navigate to the new document
+          router.replace(`/write/${data.document.id}`)
         }
       } else {
         // Update existing document
@@ -228,11 +230,15 @@ export default function WritePage({ params }: { params: Promise<{ id: string }> 
     }
   }, [content, title, saving, loading, saveDocument])
 
-  // Update saved refs when document is initially loaded
+  // Update saved refs when document is initially loaded (but not during typing)
   useEffect(() => {
-    if (documentLoadedRef.current) {
-      lastSavedContentRef.current = content
-      lastSavedTitleRef.current = title
+    if (documentLoadedRef.current && !isTypingRef.current) {
+      // Only update refs if this seems to be from a document load, not user typing
+      if (lastSavedContentRef.current === '' && lastSavedTitleRef.current === '') {
+        lastSavedContentRef.current = content
+        lastSavedTitleRef.current = title
+        console.log('Updated saved refs on document load:', { content: content.length, title: title.length })
+      }
     }
   }, [content, title])
 
