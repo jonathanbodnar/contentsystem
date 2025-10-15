@@ -11,7 +11,7 @@ interface IkigaiData {
   goals: string
   audience: string
   voice: string
-  enemy: string
+  enemy?: string
 }
 
 interface IkigaiEditorProps {
@@ -181,7 +181,7 @@ export default function IkigaiEditor({ isOpen, onClose }: IkigaiEditorProps) {
                     What You Stand Against *
                   </label>
                   <textarea
-                    value={ikigai.enemy}
+                    value={ikigai.enemy || ''}
                     onChange={(e) => handleChange('enemy', e.target.value)}
                     placeholder="What problems, mindsets, or systems do you oppose? What are you fighting against?"
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 h-24 resize-none text-gray-900 placeholder-gray-500"

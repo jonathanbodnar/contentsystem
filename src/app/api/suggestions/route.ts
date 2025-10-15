@@ -73,7 +73,7 @@ Values: ${ikigai.values}
 Goals: ${ikigai.goals}
 Audience: ${ikigai.audience}
 Voice: ${ikigai.voice}
-What You Stand Against: ${ikigai.enemy}
+What You Stand Against: ${ikigai.enemy || 'Not specified'}
 ` : ''
 
     const prompt = `

@@ -19,7 +19,7 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { mission, purpose, values, goals, audience, voice, enemy } = body
+    const { mission, purpose, values, goals, audience, voice, enemy = '' } = body
 
     // Check if ikigai already exists
     const existingIkigai = await prisma.ikigai.findFirst()

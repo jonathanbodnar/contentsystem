@@ -127,7 +127,7 @@ model Ikigai {
   goals     String
   audience  String
   voice     String
-  enemy     String   // What you stand against/oppose
+  enemy     String?  // What you stand against/oppose (optional for backward compatibility)
   updatedAt DateTime @updatedAt
   createdAt DateTime @default(now())
   
