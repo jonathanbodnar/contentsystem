@@ -84,6 +84,10 @@ export default function WritePage({ params }: { params: Promise<{ id: string }> 
       setContent('')
       setTitle('')
       setLoading(false)
+      // Reset tracking refs for new document
+      lastSavedContentRef.current = ''
+      lastSavedTitleRef.current = ''
+      console.log('New document initialized')
     } else {
       fetchDocument(resolvedParams.id)
     }
@@ -134,8 +138,11 @@ export default function WritePage({ params }: { params: Promise<{ id: string }> 
           // Update our tracking refs immediately after successful save
           lastSavedContentRef.current = content
           lastSavedTitleRef.current = title
-          // Navigate to the new document
-          router.replace(`/write/${data.document.id}`)
+          // DON'T redirect - this causes content loss
+          // Just update the URL without navigation
+          window.history.replaceState(null, '', `/write/${data.document.id}`)
+          // Update the resolved params to reflect the new ID
+          setResolvedParams({ id: data.document.id })
         }
       } else {
         // Update existing document
@@ -180,55 +187,55 @@ export default function WritePage({ params }: { params: Promise<{ id: string }> 
     router.push(`/formats/${resolvedParams.id}`)
   }
 
-  // Smart auto-save system that doesn't interfere with typing
-  useEffect(() => {
-    // Don't auto-save if we're currently saving or loading
-    if (saving || loading || !documentLoadedRef.current) return
+  // DISABLE AUTO-SAVE COMPLETELY until save cycle is fixed
+  // useEffect(() => {
+  //   // Don't auto-save if we're currently saving or loading
+  //   if (saving || loading || !documentLoadedRef.current) return
     
-    // Only save if content or title has actually changed since last save
-    const contentChanged = content !== lastSavedContentRef.current
-    const titleChanged = title !== lastSavedTitleRef.current
+  //   // Only save if content or title has actually changed since last save
+  //   const contentChanged = content !== lastSavedContentRef.current
+  //   const titleChanged = title !== lastSavedTitleRef.current
     
-    if (!contentChanged && !titleChanged) return
-    // Only auto-save if there's actual content (at least 10 characters)
-    if (!content.trim() && !title.trim()) return
-    if (content.trim().length < 10 && !title.trim()) return
+  //   if (!contentChanged && !titleChanged) return
+  //   // Only auto-save if there's actual content (at least 10 characters)
+  //   if (!content.trim() && !title.trim()) return
+  //   if (content.trim().length < 10 && !title.trim()) return
     
-    // Clear any existing timeout
-    if (autoSaveTimeoutRef.current) {
-      clearTimeout(autoSaveTimeoutRef.current)
-    }
+  //   // Clear any existing timeout
+  //   if (autoSaveTimeoutRef.current) {
+  //     clearTimeout(autoSaveTimeoutRef.current)
+  //   }
     
-    // Set typing flag to prevent saves during active typing
-    isTypingRef.current = true
+  //   // Set typing flag to prevent saves during active typing
+  //   isTypingRef.current = true
     
-    // Auto-save after user stops typing for 5 seconds
-    autoSaveTimeoutRef.current = setTimeout(async () => {
-      // Double-check that content has actually changed
-      if (content !== lastSavedContentRef.current || title !== lastSavedTitleRef.current) {
-        console.log('Auto-saving...', { 
-          contentChanged: content !== lastSavedContentRef.current,
-          titleChanged: title !== lastSavedTitleRef.current,
-          contentLength: content.length,
-          titleLength: title.length,
-          contentTrimmed: content.trim().length,
-          titleTrimmed: title.trim().length
-        })
-        setAutoSaving(true)
-        await saveDocument()
-        setAutoSaving(false)
-      } else {
-        console.log('Auto-save skipped - no changes detected')
-      }
-      isTypingRef.current = false
-    }, 5000) // 5 seconds after stopping typing
+  //   // Auto-save after user stops typing for 5 seconds
+  //   autoSaveTimeoutRef.current = setTimeout(async () => {
+  //     // Double-check that content has actually changed
+  //     if (content !== lastSavedContentRef.current || title !== lastSavedTitleRef.current) {
+  //       console.log('Auto-saving...', { 
+  //         contentChanged: content !== lastSavedContentRef.current,
+  //         titleChanged: title !== lastSavedTitleRef.current,
+  //         contentLength: content.length,
+  //         titleLength: title.length,
+  //         contentTrimmed: content.trim().length,
+  //         titleTrimmed: title.trim().length
+  //       })
+  //       setAutoSaving(true)
+  //       await saveDocument()
+  //       setAutoSaving(false)
+  //     } else {
+  //       console.log('Auto-save skipped - no changes detected')
+  //     }
+  //     isTypingRef.current = false
+  //   }, 5000) // 5 seconds after stopping typing
 
-    return () => {
-      if (autoSaveTimeoutRef.current) {
-        clearTimeout(autoSaveTimeoutRef.current)
-      }
-    }
-  }, [content, title, saving, loading, saveDocument])
+  //   return () => {
+  //     if (autoSaveTimeoutRef.current) {
+  //       clearTimeout(autoSaveTimeoutRef.current)
+  //     }
+  //   }
+  // }, [content, title, saving, loading, saveDocument])
 
   // Update saved refs when document is initially loaded (but not during typing)
   useEffect(() => {

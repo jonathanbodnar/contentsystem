@@ -11,18 +11,16 @@ interface TitleInputProps {
 export default function TitleInput({ initialValue, onTitleChange, placeholder = "Document title..." }: TitleInputProps) {
   const [localTitle, setLocalTitle] = useState(initialValue)
   const inputRef = useRef<HTMLInputElement>(null)
-  const initializedRef = useRef(false)
 
-  // Update local title when initial value changes (like after document load)
+  // Sync with parent state changes
   useEffect(() => {
-    if (initialValue !== localTitle) {
-      setLocalTitle(initialValue)
-      console.log('TitleInput updated:', { initialValue, localTitle })
-    }
+    setLocalTitle(initialValue)
+    console.log('TitleInput synced:', { initialValue })
   }, [initialValue])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newTitle = e.target.value
+    console.log('TitleInput changing:', { from: localTitle, to: newTitle })
     setLocalTitle(newTitle)
     onTitleChange(newTitle)
   }
