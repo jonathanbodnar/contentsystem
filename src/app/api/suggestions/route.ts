@@ -10,14 +10,14 @@ export async function POST(request: NextRequest) {
     
     if (!content || content.length < 15) {
       console.log('Content too short for suggestions, returning empty')
-      return NextResponse.json({ suggestions: [] })
+      return NextResponse.json({ suggestion: null })
     }
 
     // Initialize OpenAI client at runtime
     if (!process.env.OPENAI_API_KEY) {
       console.log('OpenAI API key not configured')
       return NextResponse.json({ 
-        suggestions: [],
+        suggestion: null,
         error: 'OpenAI API key not configured' 
       })
     }
@@ -95,44 +95,47 @@ Voice: ${ikigai.voice}
 What You Stand Against: ${ikigai.enemy || 'Not specified'}
 ` : ''
 
+    // Get the last 100 words to focus on what they're writing RIGHT NOW
+    const words = content.trim().split(' ')
+    const recentContent = words.slice(-100).join(' ')
+    const lastSentence = content.split(/[.!?]+/).slice(-2).join('.').trim()
+
     const prompt = `
-You are an AI writing coach sitting beside the author, reading their writing in real-time and sending quick, conversational suggestions via text messages.
+You are an AI writing coach reading over the author's shoulder. They just wrote this:
 
-${ikigaiText ? `AUTHOR'S MISSION CONTEXT:
-${ikigaiText}` : ''}
+"${lastSentence}"
 
-WHAT THEY'RE WRITING RIGHT NOW:
-${content}
+Based on what they JUST wrote, send ONE quick suggestion to help them continue. Be:
 
-THEIR CONTEXT FOR INSPIRATION:
+- DIRECTLY RELEVANT to their last sentence/thought
+- CONVERSATIONAL (like texting a friend)
+- SHORT (8-12 words max)
+- SPECIFIC to what they actually wrote
+
+${ikigaiText ? `Author's mission context: ${ikigai.mission}` : ''}
+
+Context documents available:
 ${contextText}
 
-THEIR PREVIOUS WRITINGS:
+Recent previous writing:
 ${previousWritingsText}
 
-Send 3-5 quick, conversational suggestions like you're texting them. Be:
-- CONVERSATIONAL ("Maybe mention...", "What about...", "Ooh, this reminds me of...")
-- SHORT (like a text message - 10-15 words max)
-- IMMEDIATE (help with what they're writing RIGHT NOW)
-- ENCOURAGING ("I like where this is going!", "This is good, but...")
-- SPECIFIC (reference their actual content)
+Examples of GOOD suggestions based on their last sentence:
+- If they wrote about failure: "Maybe share how you bounced back?"
+- If they mentioned a stat: "Got a story that proves this?"
+- If they made a claim: "What evidence supports this?"
+- If they started a list: "What's the next point?"
 
-Examples of good suggestions:
-- "Maybe mention that story about your first startup?"
-- "What about the delegation framework from your context?"
-- "Ooh, this connects to your mission about empowering creators"
-- "I like this, but doesn't it contradict your earlier point?"
-- "Add that stat about 80% of entrepreneurs burning out"
+Return ONE suggestion as JSON:
+{
+  "id": "unique_id",
+  "type": "continuation",
+  "content": "your 8-12 word suggestion",
+  "source": "context" or "ai" (mark if from their context docs or AI thinking),
+  "relevanceScore": 0.9
+}
 
-Return JSON array with:
-- id: unique identifier
-- type: "continuation" | "evidence" | "story" | "transition" | "detail"
-- title: not used (leave empty)
-- content: Your conversational suggestion (10-15 words, like texting)
-- source: where this comes from if applicable
-- relevanceScore: 0-1 score
-
-Be like a supportive writing buddy texting quick ideas!
+Focus ONLY on their last sentence. Help them write the very next thing.
 `
 
     const response = await openai.chat.completions.create({
@@ -151,22 +154,22 @@ Be like a supportive writing buddy texting quick ideas!
       temperature: 0.7,
     })
 
-    let suggestions = []
+    let suggestion = null
     try {
       const responseContent = response.choices[0]?.message?.content
       if (responseContent) {
-        suggestions = JSON.parse(responseContent)
+        suggestion = JSON.parse(responseContent)
       }
     } catch (parseError) {
       console.error('Failed to parse AI response:', parseError)
-      suggestions = []
+      suggestion = null
     }
 
-    return NextResponse.json({ suggestions })
+    return NextResponse.json({ suggestion })
   } catch (error) {
     console.error('Error generating suggestions:', error)
     return NextResponse.json({ 
-      suggestions: [],
+      suggestion: null,
       error: 'Failed to generate suggestions' 
     }, { status: 500 })
   }

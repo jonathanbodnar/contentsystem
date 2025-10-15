@@ -58,8 +58,12 @@ export default function AISuggestions({ currentContent, onSuggestionClick }: AIS
       
       if (response.ok) {
         const data = await response.json()
-        console.log('Suggestions received:', data.suggestions?.length || 0, 'suggestions')
-        setSuggestions(data.suggestions || [])
+        console.log('Suggestion received:', data.suggestion ? 'Yes' : 'No')
+        
+        // Add the new suggestion to the existing ones (keep last 5)
+        if (data.suggestion) {
+          setSuggestions(prev => [...prev.slice(-4), data.suggestion])
+        }
         
         if (data.error) {
           console.warn('Suggestions API warning:', data.error)
@@ -109,46 +113,52 @@ export default function AISuggestions({ currentContent, onSuggestionClick }: AIS
         <p className="text-xs text-gray-500">Live feedback as you write</p>
       </div>
 
-      {/* Chat-like suggestions feed */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-3">
-        {loading && (
-          <div className="flex items-center gap-2 text-xs text-blue-500">
-            <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce"></div>
-            <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-            <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-            <span className="ml-2">AI is thinking...</span>
-          </div>
-        )}
-
-        {suggestions.map((suggestion, index) => (
-          <div key={suggestion.id} className="flex justify-start">
-            <div
-              className="max-w-xs bg-blue-500 text-white rounded-2xl rounded-bl-sm px-4 py-2 cursor-pointer hover:bg-blue-600 transition-colors"
-              onClick={() => onSuggestionClick?.(suggestion)}
-            >
-              <div className="text-sm leading-relaxed">
-                {suggestion.content}
-              </div>
-              {suggestion.source && (
-                <div className="text-xs opacity-75 mt-1">
-                  💡 from {suggestion.source}
-                </div>
-              )}
+      {/* Chat-like suggestions feed - scrollable with newest at bottom */}
+      <div className="flex-1 overflow-y-auto flex flex-col">
+        <div className="flex-1"></div> {/* Spacer to push content to bottom */}
+        
+        <div className="p-4 space-y-3">
+          {(!currentContent || currentContent.length < 10) && (
+            <div className="text-center text-gray-400 py-4">
+              <p className="text-sm">Start writing and I&apos;ll jump in with ideas! ✍️</p>
             </div>
-          </div>
-        ))}
+          )}
 
-        {!loading && suggestions.length === 0 && currentContent && currentContent.length >= 10 && (
-          <div className="text-center text-gray-400 py-4">
-            <p className="text-xs">Keep writing... AI coach will chime in soon! 💭</p>
-          </div>
-        )}
+          {/* Show suggestions - newest at bottom */}
+          {suggestions.slice(-5).map((suggestion) => (
+            <div key={suggestion.id} className="flex justify-start animate-in slide-in-from-bottom duration-300">
+              <div
+                className="max-w-xs bg-blue-500 text-white rounded-2xl rounded-bl-sm px-4 py-2 cursor-pointer hover:bg-blue-600 transition-colors shadow-sm"
+                onClick={() => onSuggestionClick?.(suggestion)}
+              >
+                <div className="text-sm leading-relaxed">
+                  {suggestion.content}
+                </div>
+                <div className="flex items-center justify-between mt-1">
+                  <div className="text-xs opacity-75">
+                    {suggestion.source === 'context' ? '📚 from your context' : '🤖 AI idea'}
+                  </div>
+                  <div className="text-xs opacity-50">
+                    {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
 
-        {(!currentContent || currentContent.length < 10) && (
-          <div className="text-center text-gray-400 py-8">
-            <p className="text-sm">Start writing and I&apos;ll jump in with ideas! ✍️</p>
-          </div>
-        )}
+          {/* Typing indicator at bottom */}
+          {loading && (
+            <div className="flex justify-start animate-in slide-in-from-bottom duration-200">
+              <div className="bg-gray-200 rounded-2xl rounded-bl-sm px-4 py-3">
+                <div className="flex items-center gap-1">
+                  <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce"></div>
+                  <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                  <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   )
