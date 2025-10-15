@@ -283,11 +283,88 @@ export default function FormatsPage({ params }: { params: Promise<{ id: string }
                 </div>
 
                 <div className="p-4">
-                  <div className="bg-gray-50 rounded-lg p-4 max-h-64 overflow-y-auto">
-                    <div 
-                      className="prose prose-sm max-w-none text-gray-900"
-                      dangerouslySetInnerHTML={{ __html: docFormat.content || '<p class="text-gray-500 italic">No content generated - try running migration and setting OpenAI API key</p>' }}
-                    />
+                  <div className="bg-white border border-gray-200 rounded-lg p-6 max-h-80 overflow-y-auto">
+                    {docFormat.content ? (
+                      <div className="space-y-4">
+                        {/* Format-specific preview styling */}
+                        {docFormat.format.platform === 'LinkedIn' && (
+                          <div className="linkedin-preview">
+                            <div className="text-sm text-gray-600 mb-3 font-medium">LinkedIn Post Preview:</div>
+                            <div className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded">
+                              <div 
+                                className="text-gray-900 leading-relaxed whitespace-pre-wrap"
+                                style={{ lineHeight: '1.6' }}
+                              >
+                                {docFormat.content.replace(/<[^>]*>/g, '')}
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                        
+                        {docFormat.format.platform === 'X' && (
+                          <div className="twitter-preview">
+                            <div className="text-sm text-gray-600 mb-3 font-medium">X (Twitter) Thread Preview:</div>
+                            <div className="space-y-3">
+                              {docFormat.content.replace(/<[^>]*>/g, '').split(/\d+\/\d+/).filter(tweet => tweet.trim()).map((tweet, index) => (
+                                <div key={index} className="bg-black text-white p-4 rounded-xl max-w-md">
+                                  <div className="text-sm">{index + 1}/{docFormat.content.split(/\d+\/\d+/).length - 1}</div>
+                                  <div className="mt-2">{tweet.trim()}</div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                        
+                        {docFormat.format.platform === 'Email' && (
+                          <div className="email-preview">
+                            <div className="text-sm text-gray-600 mb-3 font-medium">Newsletter Preview:</div>
+                            <div className="bg-white border border-gray-300 rounded-lg overflow-hidden">
+                              <div className="bg-gray-100 px-4 py-2 border-b">
+                                <div className="text-sm font-medium">Subject: {docFormat.content.split('\n')[0] || 'Newsletter Subject'}</div>
+                              </div>
+                              <div className="p-6">
+                                <div 
+                                  className="prose prose-sm max-w-none text-gray-900"
+                                  dangerouslySetInnerHTML={{ __html: docFormat.content }}
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                        
+                        {docFormat.format.platform === 'YouTube' && (
+                          <div className="youtube-preview">
+                            <div className="text-sm text-gray-600 mb-3 font-medium">YouTube Script Preview:</div>
+                            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                              <div className="text-red-800 font-medium mb-2">🎬 Video Script</div>
+                              <div 
+                                className="text-gray-900 leading-relaxed whitespace-pre-wrap font-mono text-sm"
+                                style={{ lineHeight: '1.8' }}
+                              >
+                                {docFormat.content.replace(/<[^>]*>/g, '')}
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                        
+                        {!['LinkedIn', 'X', 'Email', 'YouTube'].includes(docFormat.format.platform) && (
+                          <div className="generic-preview">
+                            <div className="text-sm text-gray-600 mb-3 font-medium">{docFormat.format.platform} Preview:</div>
+                            <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                              <div 
+                                className="prose prose-sm max-w-none text-gray-900"
+                                dangerouslySetInnerHTML={{ __html: docFormat.content }}
+                              />
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="text-center py-8 text-gray-500">
+                        <div className="text-sm italic">No content generated</div>
+                        <div className="text-xs mt-2">Try running migration at /migrate and setting OpenAI API key</div>
+                      </div>
+                    )}
                   </div>
 
                   {docFormat.status === 'APPROVED' && (
