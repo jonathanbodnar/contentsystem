@@ -56,6 +56,42 @@ export default function WritingEditor({ content, onChange, placeholder = "Start 
         'aria-label': 'Writing editor',
         spellcheck: 'true',
       },
+      handleKeyDown: (view, event) => {
+        const { state } = view
+        const { selection } = state
+        const { $from } = selection
+        
+        // Handle Enter key in lists
+        if (event.key === 'Enter') {
+          // Check if we're in a list item
+          if ($from.parent.type.name === 'listItem') {
+            // If the current list item is empty, exit the list
+            if ($from.parent.textContent.trim() === '') {
+              event.preventDefault()
+              // Exit the list and create a paragraph
+              const tr = state.tr.lift(selection.$from, selection.$from.depth - 1)
+              view.dispatch(tr)
+              return true
+            }
+          }
+        }
+        
+        // Handle Backspace in lists
+        if (event.key === 'Backspace') {
+          if ($from.parent.type.name === 'listItem') {
+            // If at the start of an empty list item, exit the list
+            if ($from.parentOffset === 0 && $from.parent.textContent.trim() === '') {
+              event.preventDefault()
+              // Exit the list and create a paragraph
+              const tr = state.tr.lift(selection.$from, selection.$from.depth - 1)
+              view.dispatch(tr)
+              return true
+            }
+          }
+        }
+        
+        return false
+      },
     },
     autofocus: true,
     editable: true,
