@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import { Save, ArrowLeft, Send, Database, Target } from 'lucide-react'
+import { Save, ArrowLeft, Send, Database, Target, Trash2 } from 'lucide-react'
 import WritingEditor from '@/components/editor/WritingEditor'
 import AISuggestions from '@/components/suggestions/AISuggestions'
 import ContextManager from '@/components/context/ContextManager'
@@ -205,6 +205,32 @@ export default function WritePage({ params }: { params: Promise<{ id: string }> 
     router.push(`/formats/${resolvedParams.id}`)
   }
 
+  const handleDelete = async () => {
+    if (!resolvedParams || resolvedParams.id === 'new') return
+    
+    const confirmDelete = window.confirm(
+      `Are you sure you want to delete "${title || 'this document'}"? This action cannot be undone.`
+    )
+    
+    if (!confirmDelete) return
+    
+    try {
+      const response = await fetch(`/api/documents/${resolvedParams.id}`, {
+        method: 'DELETE',
+      })
+
+      if (response.ok) {
+        console.log('Document deleted successfully')
+        router.push('/')
+      } else {
+        alert('Failed to delete document')
+      }
+    } catch (error) {
+      console.error('Failed to delete document:', error)
+      alert('Failed to delete document')
+    }
+  }
+
   // DISABLE AUTO-SAVE COMPLETELY until save cycle is fixed
   // useEffect(() => {
   //   // Don't auto-save if we're currently saving or loading
@@ -385,6 +411,16 @@ export default function WritePage({ params }: { params: Promise<{ id: string }> 
               <Save className="w-4 h-4" />
               {saving ? 'Saving...' : 'Save Draft'}
             </button>
+
+            {resolvedParams?.id !== 'new' && (
+              <button
+                onClick={handleDelete}
+                className="flex items-center gap-2 px-4 py-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors"
+              >
+                <Trash2 className="w-4 h-4" />
+                Delete
+              </button>
+            )}
 
             <button
               onClick={handlePush}
