@@ -146,7 +146,7 @@ export default function AISuggestions({ currentContent, onSuggestionClick }: AIS
 
         {(!currentContent || currentContent.length < 10) && (
           <div className="text-center text-gray-400 py-8">
-            <p className="text-sm">Start writing and I'll jump in with ideas! ✍️</p>
+            <p className="text-sm">Start writing and I&apos;ll jump in with ideas! ✍️</p>
           </div>
         )}
       </div>
