@@ -47,20 +47,34 @@ export async function POST(
     })
 
     // Get context documents for additional context
-    const contextDocs = await prisma.contextDocument.findMany({
-      select: {
-        filename: true,
-        content: true,
-      },
-      take: 5
-    })
+    console.log('Fetching context documents for format generation...')
+    let contextDocs: Array<{ filename: string; content: string }> = []
+    try {
+      contextDocs = await prisma.contextDocument.findMany({
+        select: {
+          filename: true,
+          content: true,
+        },
+        take: 5
+      })
+      console.log('Found context documents for formats:', contextDocs.length)
+    } catch (contextError) {
+      console.error('Error fetching context documents (table might not exist):', contextError)
+    }
 
     // Get Ikigai for mission-driven context
-    const ikigai = await prisma.ikigai.findFirst({
-      orderBy: {
-        updatedAt: 'desc'
-      }
-    })
+    console.log('Fetching Ikigai for format generation...')
+    let ikigai = null
+    try {
+      ikigai = await prisma.ikigai.findFirst({
+        orderBy: {
+          updatedAt: 'desc'
+        }
+      })
+      console.log('Ikigai found for formats:', !!ikigai)
+    } catch (ikigaiError) {
+      console.error('Error fetching Ikigai (table might not exist):', ikigaiError)
+    }
 
     const contextText = contextDocs.map(doc => 
       `[${doc.filename}]\n${doc.content.slice(0, 800)}`
@@ -88,8 +102,10 @@ export async function POST(
           formatContextText = formatContextDocs.map(doc => 
             `[${doc.filename}]\n${doc.content.slice(0, 800)}`
           ).join('\n\n')
+          
+          console.log('Format-specific context loaded:', formatContextDocs.length, 'documents')
         } catch (error) {
-          console.error('Failed to load format-specific context:', error)
+          console.error('Failed to load format-specific context (table might not exist):', error)
         }
       }
 
