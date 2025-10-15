@@ -91,12 +91,33 @@ export default function WritePage({ params }: { params: Promise<{ id: string }> 
     }
   }, [resolvedParams, router, fetchDocument])
 
-  const saveDocument = useCallback(async (isDraft: boolean = true) => {
+  const saveDocument = useCallback(async (isDraft: boolean = true, forceEmptySave: boolean = false) => {
     if (!resolvedParams) return
+    
+    // Prevent saving completely empty documents unless forced
+    if (!forceEmptySave && !title.trim() && !content.trim()) {
+      console.log('Skipping save - no content to save', { title, content, titleLength: title.length, contentLength: content.length })
+      return
+    }
+    
+    console.log('Saving document...', { 
+      id: resolvedParams.id,
+      title: title || 'Untitled', 
+      contentLength: content.length,
+      isDraft,
+      forceEmptySave 
+    })
+    
     setSaving(true)
     try {
       if (resolvedParams.id === 'new') {
-        // Create new document
+        // Create new document - only if there's actual content
+        if (!title.trim() && !content.trim() && !forceEmptySave) {
+          console.log('Skipping new document creation - no content')
+          setSaving(false)
+          return
+        }
+        
         const response = await fetch('/api/documents', {
           method: 'POST',
           headers: {
@@ -167,7 +188,9 @@ export default function WritePage({ params }: { params: Promise<{ id: string }> 
     const titleChanged = title !== lastSavedTitleRef.current
     
     if (!contentChanged && !titleChanged) return
+    // Only auto-save if there's actual content (at least 10 characters)
     if (!content.trim() && !title.trim()) return
+    if (content.trim().length < 10 && !title.trim()) return
     
     // Clear any existing timeout
     if (autoSaveTimeoutRef.current) {
@@ -183,11 +206,17 @@ export default function WritePage({ params }: { params: Promise<{ id: string }> 
       if (content !== lastSavedContentRef.current || title !== lastSavedTitleRef.current) {
         console.log('Auto-saving...', { 
           contentChanged: content !== lastSavedContentRef.current,
-          titleChanged: title !== lastSavedTitleRef.current 
+          titleChanged: title !== lastSavedTitleRef.current,
+          contentLength: content.length,
+          titleLength: title.length,
+          contentTrimmed: content.trim().length,
+          titleTrimmed: title.trim().length
         })
         setAutoSaving(true)
         await saveDocument()
         setAutoSaving(false)
+      } else {
+        console.log('Auto-save skipped - no changes detected')
       }
       isTypingRef.current = false
     }, 5000) // 5 seconds after stopping typing
@@ -314,7 +343,7 @@ export default function WritePage({ params }: { params: Promise<{ id: string }> 
             </button>
 
             <button
-              onClick={() => saveDocument()}
+              onClick={() => saveDocument(true, true)} // Force save even if empty
               disabled={saving}
               className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors"
             >
