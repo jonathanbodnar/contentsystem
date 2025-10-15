@@ -285,8 +285,8 @@ export default function FormatsPage({ params }: { params: Promise<{ id: string }
                 <div className="p-4">
                   <div className="bg-gray-50 rounded-lg p-4 max-h-64 overflow-y-auto">
                     <div 
-                      className="prose prose-sm max-w-none"
-                      dangerouslySetInnerHTML={{ __html: docFormat.content }}
+                      className="prose prose-sm max-w-none text-gray-900"
+                      dangerouslySetInnerHTML={{ __html: docFormat.content || '<p class="text-gray-500 italic">No content generated - try running migration and setting OpenAI API key</p>' }}
                     />
                   </div>
 
