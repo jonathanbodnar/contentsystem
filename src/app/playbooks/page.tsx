@@ -62,7 +62,7 @@ export default function PlaybooksPage() {
 
       if (documentsResponse.ok) {
         const documentsData = await documentsResponse.json()
-        setDocuments(documentsData.documents.filter((doc: Document) => !doc.isDraft))
+        setDocuments(documentsData.documents.filter((doc: Document) => doc.content && doc.content.trim().length > 0))
       }
     } catch (error) {
       console.error('Failed to fetch data:', error)
@@ -325,7 +325,7 @@ Make it practical, actionable, and easy to follow for someone wanting to impleme
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 required
               >
-                <option value="">Select a published document to base the playbook on</option>
+                <option value="">Select a document with content to base the playbook on</option>
                 {documents.map((doc) => (
                   <option key={doc.id} value={doc.id}>
                     {doc.title}
@@ -333,7 +333,7 @@ Make it practical, actionable, and easy to follow for someone wanting to impleme
                 ))}
               </select>
               <p className="text-xs text-gray-500 mt-1">
-                Choose a published document that contains the concept you want to turn into a playbook
+                Choose any document with content that contains the concept you want to turn into a playbook
               </p>
             </div>
 
