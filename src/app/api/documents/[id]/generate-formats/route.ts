@@ -17,12 +17,18 @@ export async function POST(
       return NextResponse.json({ error: 'Document not found' }, { status: 404 })
     }
 
-    // Get all formats
-    const formats = await prisma.format.findMany({
-      include: {
-        postingRules: true
-      }
-    })
+    // Get all formats with error handling for missing fields
+    let formats
+    try {
+      formats = await prisma.format.findMany({
+        include: {
+          postingRules: true
+        }
+      })
+    } catch (error) {
+      console.error('Error fetching formats:', error)
+      return NextResponse.json({ error: 'Database error - please run migration first' }, { status: 500 })
+    }
 
     if (formats.length === 0) {
       // Create default formats if none exist
@@ -219,6 +225,7 @@ async function createDefaultFormats() {
 - Has a call-to-action or question to encourage engagement
 - Maintains a professional but approachable tone
 - Keeps it under 1300 characters for optimal engagement`,
+      postsCount: 1,
       postingRules: [{ frequency: 3, dayOfWeek: null, timeOfDay: '09:00' }]
     },
     {
@@ -231,6 +238,7 @@ async function createDefaultFormats() {
 - Uses relevant hashtags strategically
 - Ends with a summary or call-to-action
 - Maintains the core message across the thread`,
+      postsCount: 1,
       postingRules: [{ frequency: 5, dayOfWeek: null, timeOfDay: '14:00' }]
     },
     {
@@ -244,6 +252,7 @@ async function createDefaultFormats() {
 - Has a conversational, friendly tone
 - Ends with a clear next step or call-to-action
 - Is scannable with bullet points and short paragraphs`,
+      postsCount: 1,
       postingRules: [{ frequency: 1, dayOfWeek: 2, timeOfDay: '08:00' }] // Tuesday mornings
     },
     {
@@ -257,6 +266,7 @@ async function createDefaultFormats() {
 - Has a compelling title suggestion
 - Ends with a strong call-to-action
 - Includes suggested timestamps for key sections`,
+      postsCount: 1,
       postingRules: [{ frequency: 1, dayOfWeek: 4, timeOfDay: '16:00' }] // Thursday afternoons
     }
   ]
