@@ -42,15 +42,19 @@ export async function POST(
     }
 
     // Initialize OpenAI client at runtime
+    console.log('Checking OpenAI API key...')
     if (!process.env.OPENAI_API_KEY) {
+      console.error('OpenAI API key not found in environment variables')
       return NextResponse.json({ 
-        error: 'OpenAI API key not configured' 
+        error: 'OpenAI API key not configured. Please set OPENAI_API_KEY environment variable.' 
       }, { status: 500 })
     }
-
+    
+    console.log('OpenAI API key found, initializing client...')
     const openai = new OpenAI({
       apiKey: process.env.OPENAI_API_KEY,
     })
+    console.log('OpenAI client initialized successfully')
 
     // Get context documents for additional context
     console.log('Fetching context documents for format generation...')
@@ -209,7 +213,16 @@ Please transform the content according to the format requirements while staying 
     return NextResponse.json({ documentFormats })
   } catch (error) {
     console.error('Error generating formats:', error)
-    return NextResponse.json({ error: 'Failed to generate formats' }, { status: 500 })
+    console.error('Error details:', {
+      name: error instanceof Error ? error.name : 'Unknown',
+      message: error instanceof Error ? error.message : error,
+      stack: error instanceof Error ? error.stack : 'No stack trace'
+    })
+    return NextResponse.json({ 
+      error: 'Failed to generate formats',
+      details: error instanceof Error ? error.message : 'Unknown error',
+      type: error instanceof Error ? error.name : 'Unknown'
+    }, { status: 500 })
   }
 }
 
