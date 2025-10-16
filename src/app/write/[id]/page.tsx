@@ -161,6 +161,7 @@ export default function WritePage({ params }: { params: Promise<{ id: string }> 
           window.history.replaceState(null, '', `/write/${data.document.id}`)
           // Update the resolved params to reflect the new ID
           setResolvedParams({ id: data.document.id })
+          return data.document
         }
       } else {
         // Update existing document
@@ -179,6 +180,7 @@ export default function WritePage({ params }: { params: Promise<{ id: string }> 
         if (response.ok) {
           const data = await response.json()
           setDocument(data.document)
+          return data.document
         }
       }
       setLastSaved(new Date())
@@ -186,8 +188,10 @@ export default function WritePage({ params }: { params: Promise<{ id: string }> 
       // Update our saved content refs
       lastSavedContentRef.current = content
       lastSavedTitleRef.current = title
+      return document // Return current document if no API call was made
     } catch (error) {
       console.error('Failed to save document:', error)
+      return null
     } finally {
       setSaving(false)
     }
@@ -209,8 +213,18 @@ export default function WritePage({ params }: { params: Promise<{ id: string }> 
 
   const handlePush = async () => {
     if (!resolvedParams) return
-    await saveDocument(false)
-    router.push(`/formats/${resolvedParams.id}`)
+    
+    // If this is a new document, save it first to get a real ID
+    if (resolvedParams.id === 'new') {
+      const savedDoc = await saveDocument(false)
+      if (savedDoc && savedDoc.id) {
+        router.push(`/formats/${savedDoc.id}`)
+      }
+    } else {
+      // For existing documents, save and then navigate
+      await saveDocument(false)
+      router.push(`/formats/${resolvedParams.id}`)
+    }
   }
 
   const handleDelete = async () => {
