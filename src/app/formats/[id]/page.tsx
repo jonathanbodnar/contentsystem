@@ -282,6 +282,15 @@ export default function FormatsPage({ params }: { params: Promise<{ id: string }
                     <div>
                       <h3 className="font-semibold text-gray-800">
                         {docFormat.format.name}
+                        {(() => {
+                          // Count how many posts exist for this format
+                          const sameFormatPosts = documentFormats.filter(df => df.formatId === docFormat.formatId)
+                          if (sameFormatPosts.length > 1) {
+                            const postNumber = sameFormatPosts.findIndex(df => df.id === docFormat.id) + 1
+                            return ` (${postNumber}/${sameFormatPosts.length})`
+                          }
+                          return ''
+                        })()}
                       </h3>
                       <p className="text-sm text-gray-600">
                         {docFormat.format.platform}
