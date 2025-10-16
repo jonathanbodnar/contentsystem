@@ -86,7 +86,9 @@ export default function FormatsPage({ params }: { params: Promise<{ id: string }
       })
 
       if (response.ok) {
-        await fetchData()
+        // Force a refresh of the data
+        setDocumentFormats([]) // Clear current formats to show loading
+        await fetchData() // Fetch new data
       }
     } catch (error) {
       console.error('Failed to generate formats:', error)

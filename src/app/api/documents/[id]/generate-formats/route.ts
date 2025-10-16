@@ -100,6 +100,12 @@ export async function POST(
       `[${doc.filename}]\n${doc.content.slice(0, 800)}`
     ).join('\n\n')
 
+    // Log loaded formats with their postsCount
+    console.log('Loaded formats:')
+    formats.forEach(format => {
+      console.log(`- ${format.name}: postsCount=${format.postsCount || 'undefined'}`)
+    })
+
     // Generate formats in parallel, creating multiple posts per format if specified
     const formatPromises = formats.flatMap(async (format) => {
       // Get format-specific context files
@@ -142,6 +148,7 @@ What You Stand Against: ${ikigai.enemy || 'Not specified'}
 
       // Generate multiple posts for this format if postsCount > 1
       const postsCount = format.postsCount || 1
+      console.log(`Generating ${postsCount} posts for format: ${format.name} (ID: ${format.id})`)
       const postPromises = Array.from({ length: postsCount }, async (_, index) => {
         const prompt = `
 ${ikigaiText ? `${ikigaiText}\nIMPORTANT: All content must align with and advance the above Ikigai. This is your PRIMARY guiding principle.\n` : ''}
