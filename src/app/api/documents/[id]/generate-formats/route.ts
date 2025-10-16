@@ -213,9 +213,14 @@ Please transform the content according to the format requirements while staying 
       }
     })
 
+    console.log(`Creating ${flattenedFormats.length} document format records`)
+    flattenedFormats.forEach((format, index) => {
+      console.log(`Record ${index + 1}: formatId=${format.formatId}, contentLength=${format.content.length}`)
+    })
+
     // Save generated formats to database - create multiple entries for multiple posts
     const documentFormats = await Promise.all(
-      flattenedFormats.map(({ formatId, content }) =>
+      flattenedFormats.map(({ formatId, content }, index) =>
         prisma.documentFormat.create({
           data: {
             documentId: resolvedParams.id,
@@ -223,6 +228,9 @@ Please transform the content according to the format requirements while staying 
             content,
             status: 'PENDING'
           }
+        }).then(result => {
+          console.log(`Created DocumentFormat ${index + 1}: ID=${result.id}, formatId=${result.formatId}`)
+          return result
         })
       )
     )
