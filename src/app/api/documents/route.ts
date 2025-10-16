@@ -11,6 +11,7 @@ export async function GET() {
         select: {
           id: true,
           title: true,
+          content: true,
           isDraft: true,
           folderId: true,
           createdAt: true,
@@ -23,6 +24,7 @@ export async function GET() {
             select: {
               id: true,
               title: true,
+              content: true,
               isDraft: true,
               folderId: true,
               createdAt: true,
