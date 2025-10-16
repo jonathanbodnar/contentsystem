@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
-import OpenAI from 'openai'
+import { OpenAI } from 'openai'
 
 export async function POST(
   request: NextRequest,
@@ -43,18 +43,28 @@ export async function POST(
 
     // Initialize OpenAI client at runtime
     console.log('Checking OpenAI API key...')
-    if (!process.env.OPENAI_API_KEY) {
+    const apiKey = process.env.OPENAI_API_KEY
+    if (!apiKey || apiKey.trim() === '') {
       console.error('OpenAI API key not found in environment variables')
       return NextResponse.json({ 
         error: 'OpenAI API key not configured. Please set OPENAI_API_KEY environment variable.' 
       }, { status: 500 })
     }
     
-    console.log('OpenAI API key found, initializing client...')
-    const openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
-    })
-    console.log('OpenAI client initialized successfully')
+    console.log('OpenAI API key found, length:', apiKey.length)
+    let openai
+    try {
+      openai = new OpenAI({
+        apiKey: apiKey,
+      })
+      console.log('OpenAI client initialized successfully')
+    } catch (openaiError) {
+      console.error('Failed to initialize OpenAI client:', openaiError)
+      return NextResponse.json({ 
+        error: 'Failed to initialize OpenAI client',
+        details: openaiError instanceof Error ? openaiError.message : 'Unknown error'
+      }, { status: 500 })
+    }
 
     // Get context documents for additional context
     console.log('Fetching context documents for format generation...')
@@ -158,7 +168,7 @@ Please transform the content according to the format requirements while staying 
 `
 
         const response = await openai.chat.completions.create({
-          model: 'gpt-4',
+          model: 'gpt-4o-mini',
           messages: [
             {
               role: 'system',
