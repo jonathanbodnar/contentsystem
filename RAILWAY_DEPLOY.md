@@ -126,3 +126,4 @@ railway login
 railway link [your-project-id]
 railway run npm run db:deploy
 ```
+

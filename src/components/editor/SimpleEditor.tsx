@@ -51,3 +51,4 @@ export default function SimpleEditor({ content, onChange, placeholder = "Start w
     </div>
   )
 }
+

@@ -108,50 +108,47 @@ What You Stand Against: ${ikigai.enemy || 'Not specified'}
     const fullContext = content.slice(0, 2000)
 
     const prompt = `
-You are a content strategist helping the author develop their ideas. 
+You are finding relevant stories, quotes, and specific content from the author's context documents that relate to what they're currently writing.
 
-CURRENT DOCUMENT CONTEXT:
-${fullContext}
-
-CURRENT PARAGRAPH:
+WHAT THEY'RE WRITING NOW:
 ${currentParagraph}
 
-MOST RECENT CONTENT:
+RECENT CONTENT:
 ${recentContent}
 
-Based on what they've written so far and where they are in their document, suggest ONE specific, substantive idea they could add next. Look at the flow of their argument, the points they've made, and what logical next step would strengthen their content.
+FULL DOCUMENT FOR CONTEXT:
+${fullContext}
+
+AUTHOR'S CONTEXT DOCUMENTS:
+${contextText}
+
+AUTHOR'S PREVIOUS WRITINGS:
+${previousWritingsText}
 
 ${ikigaiText}
 
-Context available:
-${contextText}
+Your job: Find ONE specific story, quote, stat, or example from their context documents or previous writings that directly relates to what they just wrote. This should be:
 
-Previous writings:
-${previousWritingsText}
+- A DIRECT QUOTE or specific story from their uploaded context
+- HIGHLY RELEVANT to their current paragraph
+- Something they can immediately add to strengthen their point
+- Attributed to the source document
 
-Give SPECIFIC content suggestions, not generic prompts:
-
-GOOD (specific ideas):
-- If they wrote about business failure: "The 80/20 rule applies - 80% of failures come from hiring mistakes"
-- If they mentioned necessity: "Consider the 2008 financial crisis - companies that survived innovated out of necessity"
-- If they discussed scaling: "Mention the 'founder's trap' - when leaders become bottlenecks"
-- If they wrote about people: "Reference Patrick Lencioni's trust pyramid from your context"
-
-BAD (generic prompts):
-- "Can you share more about that?"
-- "What's a specific example?"
-- "Tell us more"
-
-Return ONE substantive idea as JSON:
+Return ONE relevant piece as JSON:
 {
   "id": "unique_id",
-  "type": "continuation",
-  "content": "specific content idea they could add (15-25 words)",
-  "source": "context" or "ai",
+  "type": "story" | "quote" | "stat" | "example",
+  "content": "The actual quote, story, or example (direct excerpt from their context, 20-40 words)",
+  "source": "Name of the context document this came from",
   "relevanceScore": 0.9
 }
 
-Give them actual IDEAS to write about, not prompts to think about.
+Examples:
+- If they wrote about leadership → Pull a leadership story from their context
+- If they mentioned failure → Find a failure example from their previous writing
+- If they discussed systems → Reference a specific framework from their context docs
+
+IMPORTANT: The content should be a direct excerpt or paraphrase from their actual context documents, not made up content.
 `
 
     const response = await openai.chat.completions.create({
@@ -159,7 +156,7 @@ Give them actual IDEAS to write about, not prompts to think about.
       messages: [
         {
           role: 'system',
-          content: 'You are a writing assistant that reads the full context of what the author has written and provides specific, actionable suggestions for what they should write next. You understand the flow and structure of their argument and suggest logical next steps. Always respond with valid JSON only.'
+          content: 'You are a context retrieval assistant that finds relevant stories, quotes, statistics, and examples from the author\'s uploaded context documents and previous writings. You pull direct quotes and specific content that relates to what they\'re currently writing. Always respond with valid JSON only.'
         },
         {
           role: 'user',

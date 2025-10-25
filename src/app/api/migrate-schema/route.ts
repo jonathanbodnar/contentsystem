@@ -64,3 +64,4 @@ export async function GET() {
     instructions: 'Send a POST request to this endpoint to add missing database fields'
   })
 }
+

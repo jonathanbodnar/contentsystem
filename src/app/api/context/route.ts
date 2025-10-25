@@ -54,3 +54,4 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json({ error: 'Failed to delete document' }, { status: 500 })
   }
 }
+

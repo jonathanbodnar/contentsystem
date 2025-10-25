@@ -168,3 +168,4 @@ export default function DocumentList({ onDocumentSelect, onNewDocument, selected
     </div>
   )
 }
+

@@ -19,7 +19,7 @@ interface Document {
 
 interface Suggestion {
   id: string
-  type: 'continuation' | 'evidence' | 'story' | 'transition' | 'detail'
+  type: 'story' | 'quote' | 'stat' | 'example'
   title: string
   content: string
   source?: string

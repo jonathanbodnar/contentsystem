@@ -5,7 +5,7 @@ import { Lightbulb, FileText, Quote, ArrowRight, Bookmark } from 'lucide-react'
 
 interface Suggestion {
   id: string
-  type: 'continuation' | 'evidence' | 'story' | 'transition' | 'detail'
+  type: 'story' | 'quote' | 'stat' | 'example'
   title: string
   content: string
   source?: string
@@ -109,8 +109,8 @@ export default function AISuggestions({ currentContent, onSuggestionClick }: AIS
     <div className="w-80 bg-white border-l border-gray-100 flex flex-col max-h-screen">
       {/* Header */}
       <div className="p-4 border-b border-gray-100">
-        <h3 className="text-sm font-medium text-gray-700">AI Writing Coach</h3>
-        <p className="text-xs text-gray-500">Live feedback as you write</p>
+        <h3 className="text-sm font-medium text-gray-700">From Your Context</h3>
+        <p className="text-xs text-gray-500">Relevant stories, quotes & examples</p>
       </div>
 
       {/* Chat-like suggestions feed - scrollable with newest at bottom */}
@@ -136,7 +136,7 @@ export default function AISuggestions({ currentContent, onSuggestionClick }: AIS
                 </div>
                 <div className="flex items-center justify-between mt-2">
                   <div className="text-xs opacity-75">
-                    {suggestion.source === 'context' ? '📚 from your context' : '🧠 AI insight'}
+                    📚 {suggestion.source || 'your context'}
                   </div>
                   <div className="text-xs opacity-50">
                     {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
