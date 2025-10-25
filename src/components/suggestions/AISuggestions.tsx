@@ -81,18 +81,16 @@ export default function AISuggestions({ currentContent, onSuggestionClick }: AIS
 
   const getSuggestionIcon = (type: Suggestion['type']) => {
     switch (type) {
-      case 'continuation':
-        return <ArrowRight className="w-4 h-4 text-blue-500" />
-      case 'evidence':
-        return <FileText className="w-4 h-4 text-green-500" />
       case 'story':
         return <Quote className="w-4 h-4 text-purple-500" />
-      case 'transition':
-        return <ArrowRight className="w-4 h-4 text-orange-500" />
-      case 'detail':
-        return <Bookmark className="w-4 h-4 text-yellow-500" />
+      case 'quote':
+        return <Quote className="w-4 h-4 text-blue-500" />
+      case 'stat':
+        return <FileText className="w-4 h-4 text-green-500" />
+      case 'example':
+        return <Lightbulb className="w-4 h-4 text-yellow-500" />
       default:
-        return <Lightbulb className="w-4 h-4 text-gray-500" />
+        return <FileText className="w-4 h-4 text-gray-500" />
     }
   }
 
