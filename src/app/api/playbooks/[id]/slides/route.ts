@@ -16,7 +16,7 @@ export async function PUT(
 
     // Create new slides
     const createdSlides = await Promise.all(
-      slides.map((slide: any) =>
+      slides.map((slide: { order: number; title: string; content: string; layout: string; images?: string; position?: string }) =>
         prisma.playbookSlide.create({
           data: {
             playbookId: resolvedParams.id,

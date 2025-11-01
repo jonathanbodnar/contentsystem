@@ -54,7 +54,7 @@ export default function PlaybookSlidesPage({ params }: { params: Promise<{ id: s
             const playbookContent = JSON.parse(data.playbook.content)
             if (playbookContent.steps && playbookContent.steps.length > 0) {
               // Auto-generate slides from steps
-              const autoSlides = playbookContent.steps.map((step: any, index: number) => ({
+              const autoSlides = playbookContent.steps.map((step: { title: string; content: string }, index: number) => ({
                 id: `auto-${index}`,
                 order: index + 1,
                 title: step.title,
