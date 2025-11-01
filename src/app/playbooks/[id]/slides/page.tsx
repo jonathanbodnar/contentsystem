@@ -47,7 +47,31 @@ export default function PlaybookSlidesPage({ params }: { params: Promise<{ id: s
       if (response.ok) {
         const data = await response.json()
         setPlaybook(data.playbook)
-        setSlides(data.playbook.slides || [])
+        
+        // If no slides exist, generate them from playbook steps
+        if (!data.playbook.slides || data.playbook.slides.length === 0) {
+          try {
+            const playbookContent = JSON.parse(data.playbook.content)
+            if (playbookContent.steps && playbookContent.steps.length > 0) {
+              // Auto-generate slides from steps
+              const autoSlides = playbookContent.steps.map((step: any, index: number) => ({
+                id: `auto-${index}`,
+                order: index + 1,
+                title: step.title,
+                content: step.content.replace(/<[^>]*>/g, ''), // Strip HTML
+                layout: 'text',
+              }))
+              setSlides(autoSlides)
+            } else {
+              setSlides([])
+            }
+          } catch (error) {
+            console.error('Failed to parse playbook content:', error)
+            setSlides([])
+          }
+        } else {
+          setSlides(data.playbook.slides)
+        }
       }
     } catch (error) {
       console.error('Failed to fetch playbook:', error)
