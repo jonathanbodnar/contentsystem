@@ -6,6 +6,7 @@ import { Database, Target, BookOpen, Settings } from 'lucide-react'
 import DocumentList from '@/components/sidebar/DocumentList'
 import ContextManager from '@/components/context/ContextManager'
 import IkigaiEditor from '@/components/ikigai/IkigaiEditor'
+import TopicList from '@/components/topics/TopicList'
 
 interface Document {
   id: string
@@ -120,6 +121,9 @@ export default function Home() {
           </div>
         </div>
       </div>
+
+      {/* Topic List */}
+      <TopicList />
 
       {/* Ikigai Editor */}
       <IkigaiEditor

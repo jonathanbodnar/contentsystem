@@ -25,6 +25,19 @@ export async function POST() {
       END $$;
     `
     
+    // Create topics table if it doesn't exist
+    await prisma.$executeRaw`
+      CREATE TABLE IF NOT EXISTS "topics" (
+        "id" TEXT NOT NULL,
+        "title" TEXT NOT NULL,
+        "completed" BOOLEAN NOT NULL DEFAULT false,
+        "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        
+        CONSTRAINT "topics_pkey" PRIMARY KEY ("id")
+      );
+    `
+    
     // Try to create the format_feedback table if it doesn't exist
     await prisma.$executeRaw`
       CREATE TABLE IF NOT EXISTS "format_feedback" (

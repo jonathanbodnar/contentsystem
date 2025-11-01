@@ -33,6 +33,16 @@ enum DocumentStatus {
   FINISHED
 }
 
+model Topic {
+  id        String   @id @default(cuid())
+  title     String
+  completed Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@map("topics")
+}
+
 model DocumentVersion {
   id         String   @id @default(cuid())
   documentId String
