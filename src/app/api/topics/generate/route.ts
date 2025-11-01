@@ -14,7 +14,7 @@ export async function POST() {
     })
 
     // Get recent documents
-    let recentDocs = []
+    let recentDocs: Array<{ title: string; content: string }> = []
     try {
       recentDocs = await prisma.document.findMany({
         select: {
@@ -31,7 +31,7 @@ export async function POST() {
     }
 
     // Get context documents
-    let contextDocs = []
+    let contextDocs: Array<{ filename: string; content: string }> = []
     try {
       contextDocs = await prisma.contextDocument.findMany({
         select: {
