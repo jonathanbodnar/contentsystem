@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { Plus, BookOpen, FileText, Target, Database, Presentation, ArrowLeft } from 'lucide-react'
+import { Plus, BookOpen, FileText, Target, Database, Presentation, ArrowLeft, Play } from 'lucide-react'
 import ContextManager from '@/components/context/ContextManager'
 import IkigaiEditor from '@/components/ikigai/IkigaiEditor'
 
@@ -176,6 +176,7 @@ export default function PlaybooksPage() {
                 onClick={() => router.push(`/playbooks/${playbook.id}`)}
                 onEdit={() => router.push(`/playbooks/${playbook.id}/edit`)}
                 onSlides={() => router.push(`/playbooks/${playbook.id}/slides`)}
+                onPresent={() => router.push(`/playbooks/${playbook.id}/present`)}
               />
             ))}
           </div>
@@ -206,11 +207,12 @@ export default function PlaybooksPage() {
   )
 }
 
-function PlaybookCard({ playbook, onClick, onEdit, onSlides }: {
+function PlaybookCard({ playbook, onClick, onEdit, onSlides, onPresent }: {
   playbook: Playbook
   onClick: () => void
   onEdit: () => void
   onSlides: () => void
+  onPresent: () => void
 }) {
   return (
     <div className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
@@ -240,23 +242,30 @@ function PlaybookCard({ playbook, onClick, onEdit, onSlides }: {
           <span>{new Date(playbook.updatedAt).toLocaleDateString()}</span>
         </div>
 
-        <div className="flex gap-2">
+        <div className="grid grid-cols-2 gap-2">
           <button
             onClick={onClick}
-            className="flex-1 px-3 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+            className="px-3 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
           >
             <FileText className="w-4 h-4 inline mr-1" />
             View
           </button>
           <button
+            onClick={onPresent}
+            className="px-3 py-2 text-sm bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+          >
+            <Play className="w-4 h-4 inline mr-1" />
+            Present
+          </button>
+          <button
             onClick={onEdit}
-            className="flex-1 px-3 py-2 text-sm bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors"
+            className="px-3 py-2 text-sm bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors"
           >
             Edit
           </button>
           <button
             onClick={onSlides}
-            className="flex-1 px-3 py-2 text-sm bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors"
+            className="px-3 py-2 text-sm bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors"
           >
             <Presentation className="w-4 h-4 inline mr-1" />
             Slides

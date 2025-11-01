@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, Edit, Presentation } from 'lucide-react'
+import { ArrowLeft, Edit, Presentation, Play } from 'lucide-react'
 
 interface PlaybookStep {
   title: string
@@ -114,6 +114,14 @@ export default function PlaybookViewPage({ params }: { params: Promise<{ id: str
           </div>
 
           <div className="flex items-center gap-3">
+            <button
+              onClick={() => router.push(`/playbooks/${resolvedParams.id}/present`)}
+              className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+            >
+              <Play className="w-4 h-4" />
+              Present
+            </button>
+
             <button
               onClick={() => router.push(`/playbooks/${resolvedParams.id}/edit`)}
               className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors"
