@@ -102,11 +102,21 @@ export default function TopicList({ onTopicClick }: TopicListProps) {
 
       if (response.ok) {
         const data = await response.json()
+        console.log('Generated ideas:', data.ideas)
         setGeneratedIdeas(data.ideas || [])
-        setShowIdeaModal(true)
+        if (data.ideas && data.ideas.length > 0) {
+          setShowIdeaModal(true)
+        } else {
+          alert('No topic ideas were generated. Make sure OpenAI API key is configured.')
+        }
+      } else {
+        const errorData = await response.json()
+        console.error('Topic generation error:', errorData)
+        alert('Failed to generate ideas: ' + (errorData.error || 'Unknown error'))
       }
     } catch (error) {
       console.error('Failed to generate ideas:', error)
+      alert('Failed to generate ideas. Check console for details.')
     } finally {
       setGenerating(false)
     }
