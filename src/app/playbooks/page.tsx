@@ -273,6 +273,7 @@ function CreatePlaybookModal({ documents, onClose, onCreate }: {
   onCreate: (sourceDocumentId: string, prompt: string) => void
 }) {
   const [selectedDocumentId, setSelectedDocumentId] = useState('')
+  const [generating, setGenerating] = useState(false)
   const [customPrompt, setCustomPrompt] = useState(`Transform this concept into a comprehensive, actionable playbook that includes:
 
 1. Clear step-by-step instructions
@@ -292,11 +293,16 @@ Structure the playbook with:
 
 Make it practical, actionable, and easy to follow for someone wanting to implement this concept.`)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (selectedDocumentId && customPrompt.trim()) {
-      onCreate(selectedDocumentId, customPrompt)
-      onClose()
+      setGenerating(true)
+      try {
+        await onCreate(selectedDocumentId, customPrompt)
+        onClose()
+      } catch (error) {
+        setGenerating(false)
+      }
     }
   }
 

@@ -4,7 +4,6 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { Save, ArrowLeft, Send, Database, Target, Trash2 } from 'lucide-react'
 import WritingEditor from '@/components/editor/WritingEditor'
-import AISuggestions from '@/components/suggestions/AISuggestions'
 import ContextManager from '@/components/context/ContextManager'
 import IkigaiEditor from '@/components/ikigai/IkigaiEditor'
 
@@ -15,15 +14,6 @@ interface Document {
   isDraft: boolean
   createdAt: string
   updatedAt: string
-}
-
-interface Suggestion {
-  id: string
-  type: 'story' | 'quote' | 'stat' | 'example'
-  title: string
-  content: string
-  source?: string
-  relevanceScore: number
 }
 
 export default function WritePage({ params }: { params: Promise<{ id: string }> }) {
@@ -197,19 +187,6 @@ export default function WritePage({ params }: { params: Promise<{ id: string }> 
     }
   }, [resolvedParams, content, title, router])
 
-  const handleSuggestionClick = (suggestion: Suggestion) => {
-    // Insert suggestion as a new paragraph at the end
-    const suggestionText = suggestion.content.startsWith('•') 
-      ? suggestion.content 
-      : `• ${suggestion.content}`
-    
-    const newContent = content.trim() 
-      ? content + '\n\n' + suggestionText
-      : suggestionText
-    
-    console.log('Adding suggestion:', suggestion.title)
-    setContent(newContent)
-  }
 
   const handlePush = async () => {
     if (!resolvedParams) return
@@ -466,10 +443,7 @@ export default function WritePage({ params }: { params: Promise<{ id: string }> 
       </div>
 
       {/* AI Suggestions Sidebar */}
-      <AISuggestions
-        currentContent={content}
-        onSuggestionClick={handleSuggestionClick}
-      />
+      {/* Removed context suggestions - will implement better context integration later */}
 
       {/* Ikigai Editor */}
       <IkigaiEditor
