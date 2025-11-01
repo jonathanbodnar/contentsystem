@@ -27,6 +27,7 @@ export default function WritePage({ params }: { params: Promise<{ id: string }> 
   const [lastSaved, setLastSaved] = useState<Date | null>(null)
   const [showContextManager, setShowContextManager] = useState(false)
   const [showIkigaiEditor, setShowIkigaiEditor] = useState(false)
+  const [status, setStatus] = useState<'draft' | 'finished'>('draft')
   const [autoSaving, setAutoSaving] = useState(false)
   const autoSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const lastSavedContentRef = useRef<string>('')
@@ -385,6 +386,15 @@ export default function WritePage({ params }: { params: Promise<{ id: string }> 
                 ✓ Saved {lastSaved.toLocaleTimeString()}
               </span>
             ) : null}
+
+            <select
+              value={status}
+              onChange={(e) => setStatus(e.target.value as 'draft' | 'finished')}
+              className="px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            >
+              <option value="draft">Draft</option>
+              <option value="finished">Finished</option>
+            </select>
             
             <button
               onClick={() => setShowIkigaiEditor(true)}

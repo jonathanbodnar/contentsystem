@@ -9,6 +9,7 @@ interface Document {
   createdAt: string
   updatedAt: string
   isDraft: boolean
+  status?: 'DRAFT' | 'FINISHED'
   folderId?: string
 }
 
@@ -107,16 +108,24 @@ export default function DocumentList({ onDocumentSelect, onNewDocument, selected
       >
         <FileText className="w-4 h-4 text-gray-400" />
         <div className="flex-1 min-w-0">
-          <p className="text-sm text-gray-800 truncate">
-            {document.title || 'Untitled'}
-          </p>
+          <div className="flex items-center gap-2 mb-1">
+            <p className="text-sm text-gray-800 truncate flex-1">
+              {document.title || 'Untitled'}
+            </p>
+            {document.status === 'FINISHED' ? (
+              <span className="px-1.5 py-0.5 bg-green-100 text-green-700 text-xs rounded">
+                ✓
+              </span>
+            ) : (
+              <span className="px-1.5 py-0.5 bg-yellow-100 text-yellow-700 text-xs rounded">
+                Draft
+              </span>
+            )}
+          </div>
           <p className="text-xs text-gray-500">
-            {document.isDraft ? 'Draft' : 'Published'} • {new Date(document.updatedAt).toLocaleDateString()}
+            {new Date(document.updatedAt).toLocaleDateString()}
           </p>
         </div>
-        {document.isDraft && (
-          <Edit3 className="w-3 h-3 text-gray-400" />
-        )}
       </div>
     )
   }

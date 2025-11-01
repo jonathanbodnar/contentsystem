@@ -11,20 +11,26 @@ datasource db {
 }
 
 model Document {
-  id          String   @id @default(cuid())
+  id          String         @id @default(cuid())
   title       String
   content     String
-  isDraft     Boolean  @default(true)
+  isDraft     Boolean        @default(true)
+  status      DocumentStatus @default(DRAFT)
   folderId    String?
-  folder      Folder?  @relation(fields: [folderId], references: [id])
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  folder      Folder?        @relation(fields: [folderId], references: [id])
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
   versions    DocumentVersion[]
   formats     DocumentFormat[]
   playbooks   Playbook[]
   formatFeedback FormatFeedback[]
   
   @@map("documents")
+}
+
+enum DocumentStatus {
+  DRAFT
+  FINISHED
 }
 
 model DocumentVersion {

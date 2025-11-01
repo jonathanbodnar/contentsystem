@@ -9,6 +9,22 @@ export async function POST() {
       ADD COLUMN IF NOT EXISTS "postsCount" INTEGER DEFAULT 1;
     `
     
+    // Add status column to documents table if it doesn't exist
+    await prisma.$executeRaw`
+      ALTER TABLE documents
+      ADD COLUMN IF NOT EXISTS "status" TEXT DEFAULT 'DRAFT';
+    `
+    
+    // Create DocumentStatus enum type if it doesn't exist
+    await prisma.$executeRaw`
+      DO $$ 
+      BEGIN
+        IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'DocumentStatus') THEN
+          CREATE TYPE "DocumentStatus" AS ENUM ('DRAFT', 'FINISHED');
+        END IF;
+      END $$;
+    `
+    
     // Try to create the format_feedback table if it doesn't exist
     await prisma.$executeRaw`
       CREATE TABLE IF NOT EXISTS "format_feedback" (
