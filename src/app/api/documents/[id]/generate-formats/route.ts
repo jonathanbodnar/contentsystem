@@ -107,7 +107,7 @@ export async function POST(
     })
 
     // Generate formats in parallel, creating multiple posts per format if specified
-    const formatPromises = formats.flatMap(async (format) => {
+    const formatPromises = formats.map(async (format) => {
       // Get format-specific context files
       let formatContextText = ''
       if (format.contextFiles) {

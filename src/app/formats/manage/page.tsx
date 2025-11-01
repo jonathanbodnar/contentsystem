@@ -209,6 +209,13 @@ function FormatCard({ format, onEdit, onDelete }: {
 
       <div className="space-y-3">
         <div>
+          <p className="text-xs font-medium text-gray-700 mb-1">Posts Per Content</p>
+          <p className="text-sm text-gray-600">
+            {format.postsCount || 1} unique post{(format.postsCount || 1) > 1 ? 's' : ''} per content piece
+          </p>
+        </div>
+
+        <div>
           <p className="text-xs font-medium text-gray-700 mb-1">Posting Rules</p>
           <p className="text-sm text-gray-600">
             {format.postingRules[0]?.frequency || 0} times per week
