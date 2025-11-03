@@ -6,6 +6,7 @@ import { Save, ArrowLeft, Send, Database, Target, Trash2 } from 'lucide-react'
 import WritingEditor from '@/components/editor/WritingEditor'
 import ContextManager from '@/components/context/ContextManager'
 import IkigaiEditor from '@/components/ikigai/IkigaiEditor'
+import ResearchPanel from '@/components/research/ResearchPanel'
 
 interface Document {
   id: string
@@ -452,8 +453,8 @@ export default function WritePage({ params }: { params: Promise<{ id: string }> 
         </div>
       </div>
 
-      {/* AI Suggestions Sidebar */}
-      {/* Removed context suggestions - will implement better context integration later */}
+      {/* Research Panel */}
+      <ResearchPanel currentContent={content} />
 
       {/* Ikigai Editor */}
       <IkigaiEditor
