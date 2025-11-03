@@ -116,7 +116,7 @@ export default function ResearchPanel({ currentContent }: ResearchPanelProps) {
             <BookOpen className="w-12 h-12 mx-auto mb-3 opacity-50" />
             <p className="text-sm mb-2">Explore your ideas deeper</p>
             <p className="text-xs">
-              Click "Research This Topic" to find sources, studies, and insights related to what you&apos;re writing
+              Click &quot;Research This Topic&quot; to find sources, studies, and insights related to what you&apos;re writing
             </p>
           </div>
         ) : researching ? (
