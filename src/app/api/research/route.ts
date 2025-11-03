@@ -67,11 +67,29 @@ Focus on credible, verifiable sources. Provide 5-8 highly relevant research insi
     let results = []
     try {
       const responseContent = response.choices[0]?.message?.content
+      console.log('AI Response:', responseContent)
+      
       if (responseContent) {
-        results = JSON.parse(responseContent)
+        // Try to extract JSON if it's wrapped in markdown code blocks
+        let jsonContent = responseContent
+        if (responseContent.includes('```json')) {
+          const match = responseContent.match(/```json\s*([\s\S]*?)\s*```/)
+          if (match) {
+            jsonContent = match[1]
+          }
+        } else if (responseContent.includes('```')) {
+          const match = responseContent.match(/```\s*([\s\S]*?)\s*```/)
+          if (match) {
+            jsonContent = match[1]
+          }
+        }
+        
+        results = JSON.parse(jsonContent)
+        console.log('Parsed results:', results.length, 'items')
       }
     } catch (parseError) {
       console.error('Failed to parse AI response:', parseError)
+      console.error('Raw response:', response.choices[0]?.message?.content)
       // Return empty array if parsing fails
       results = []
     }
